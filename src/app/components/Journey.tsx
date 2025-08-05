@@ -9,7 +9,17 @@ const Journey = () => {
             text-lg
             '>A proven path from learning to leadership.</p>
 
-            <div className='flex flex-wrap justify-center items-center flex-col lg:flex-row gap-8'>
+            <div
+                className='
+                flex 
+                justify-center 
+                items-center
+                md:items-start
+                flex-col 
+                md:flex-row 
+                sm:flex-wrap
+                gap-8'
+            >
                 <Phase
                     svgLogo="/Phase1.svg"
                     phaseName="Phase 1: Foundations"

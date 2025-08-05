@@ -14,7 +14,7 @@ const Hero = () => {
                 </div>
                 <div className='absolute top-0 left-0 text-white mt-10 center
                 
-                ml-14 sm:ml-24'>
+                ml-14 sm:ml-20 md:48'>
                     <h2 className='font-bold text-[50px] tracking-[1.5px]
                     
                     '>Forge Your Future in Tech</h2>
