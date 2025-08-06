@@ -69,7 +69,7 @@ export default function ReviewerDashboard() {
       ? applications
       : applications.filter((app) => {
           if (selectedFilter === "underReview") {
-            return app.status === "in_progress";
+            return app.status === "under_review";
           } else if (selectedFilter === "complete") {
             return app.status === "accepted";
           }

@@ -45,7 +45,7 @@ const ApplicationCard: FC<Props> = ({ application, onStatusChange }) => {
       case "pending_review":
         displayStatus = "New";
         break;
-      case "in_progress":
+      case "under_review":
         displayStatus = "Under Review";
         break;
       case "accepted":
@@ -95,12 +95,12 @@ const ApplicationCard: FC<Props> = ({ application, onStatusChange }) => {
                   headers: {
                     "Content-Type": "application/json",
                   },
-                  body: JSON.stringify({ status: "in_progress" }),
+                  body: JSON.stringify({ status: "under_review" }),
                 }
               ).catch(() => {});
               setLocalStatus("Under Review");
               if (onStatusChange) {
-                onStatusChange(application.application_id, "in_progress");
+                onStatusChange(application.application_id, "under_review");
               }
             }}
             className="w-full block text-center px-4 py-2.5 rounded-lg font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200 cursor-pointer"
