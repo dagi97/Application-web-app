@@ -260,7 +260,7 @@ export default function ReviewerDashboard() {
         <div className="max-w-7xl mx-auto pb-10 pt-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           <hr className="text-gray-600 w-full mb-3" />
           <p className="text-sm text-gray-400 text-center">
-            &copy; 2025 A2SV. All rights reserved.
+            &copy; {new Date().getFullYear()} A2SV. All rights reserved.
           </p>
         </div>
       </footer>
