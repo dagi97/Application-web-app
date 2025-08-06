@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 const Engineers = () => {
     return (
-        <div className='px-20 md:px-48   
+        <div className='px-10 sm:px-30    
         py-20      
         bg-[#F3F4F6]        
         flex flex-col 
@@ -13,7 +13,7 @@ const Engineers = () => {
         lg:justify-center
         
         '>
-            <div className='max-w-[600px] mt-10'>
+            <div className=' mt-10'>
 
                 <h3 className='
             text-center

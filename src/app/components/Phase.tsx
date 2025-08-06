@@ -3,7 +3,6 @@ import Image from 'next/image'
 const Phase = ({ svgLogo, phaseName, phaseDescription }: any) => {
     return (
         <div className='flex gap-5 
-        sm:max-w-[250px]
         
         
         items-start

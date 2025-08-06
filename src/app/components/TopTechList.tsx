@@ -9,6 +9,7 @@ const TopTechList = () => {
         min-h-20
         bg-[#F3F4F6]
         py-12
+        
         '>
             <Image
                 aria-hidden

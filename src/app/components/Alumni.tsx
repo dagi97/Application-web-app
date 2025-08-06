@@ -4,7 +4,8 @@ const Alumni = () => {
     return (
         <div className='
         bg-[#f7faff]
-        px-24 py-14
+        py-14
+        px-10 sm:px-30
       
 
         '>

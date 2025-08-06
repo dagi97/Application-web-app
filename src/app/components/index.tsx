@@ -7,14 +7,14 @@ import Alumni from "./Alumni"
 import Ready from "./Ready"
 const Index = () => {
     return (
-        <>
+        <div>
             <Hero />
             <TopTechList />
             <Journey />
             <Engineers />
             <Alumni />
             <Ready />
-        </>
+        </div>
     )
 }
 

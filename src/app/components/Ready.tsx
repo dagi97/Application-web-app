@@ -6,7 +6,7 @@ const Ready = () => {
         <div
             className="text-white bg-[#4338CA]
             py-20 flex flex-col gap-5 items-center
-            px-20
+            px-10 sm:px-30
             "
         >
             <h3 className='text-center

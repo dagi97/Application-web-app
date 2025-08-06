@@ -3,7 +3,9 @@ import Phase from './Phase'
 
 const Journey = () => {
     return (
-        <div className='p-20'>
+        <div className='p-20
+        px-10 sm:px-30
+        '>
             <h3 className='text-4xl font-bold text-center'>Your Journey to Silicon Valley</h3>
             <p className='text-[#4B5563] text-center py-4 mb-16 font-[400]
             text-lg
@@ -17,8 +19,9 @@ const Journey = () => {
                 md:items-start
                 flex-col 
                 md:flex-row 
-                sm:flex-wrap
-                gap-8'
+                gap-8
+                '
+
             >
                 <Phase
                     svgLogo="/Phase1.svg"
