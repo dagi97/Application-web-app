@@ -96,7 +96,7 @@ export default function ReviewerDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <Header reviewerName={reviewerName} />
+      <Header name={reviewerName} />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-12 mb-24">
@@ -174,7 +174,7 @@ export default function ReviewerDashboard() {
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-10 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {isLoading ? (
               <div className="col-span-3 text-center text-gray-500">
                 Loading...

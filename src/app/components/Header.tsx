@@ -3,11 +3,11 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
-interface Props {
-  reviewerName: string;
+interface HeaderProps {
+  name: string;
 }
 
-const Header = ({ reviewerName }: Props) => {
+const Header = (prop: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -48,7 +48,7 @@ const Header = ({ reviewerName }: Props) => {
               href="#"
               className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
             >
-              {reviewerName}
+              {prop.name}
             </a>
             <a
               href="#"
@@ -74,16 +74,19 @@ const Header = ({ reviewerName }: Props) => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
-            <p className="block text-gray-600 hover:text-gray-900 py-2">
+            <Link
+              href="#" // Fix when you change pages
+              className="block text-gray-600 hover:text-gray-900 py-2"
+            >
               Dashboard
-            </p>
+            </Link>
             <Link
               href="#" // Placeholder for profile link
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Your Profile
             </Link>
-            <span className="block text-gray-600 py-2">{reviewerName}</span>
+            <span className="block text-gray-600 py-2">John Doe</span>
             <button className="block text-gray-600 hover:text-gray-900 py-2">
               Logout
             </button>
