@@ -75,7 +75,7 @@ const Header = (prop: HeaderProps) => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="#" // Fix when you change pages
+              href="#" // Fix when you want to link to the dashboard
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
