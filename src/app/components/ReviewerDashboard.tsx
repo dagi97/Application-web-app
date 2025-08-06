@@ -8,6 +8,7 @@ import {
   loginAndStoreToken,
 } from "../lib/redux/utils/login";
 import ApplicationCard from "./ApplicationCard";
+import Header from "./Header";
 
 export default function ReviewerDashboard() {
   const [leftHovered, setLeftHovered] = useState(false);
@@ -95,51 +96,7 @@ export default function ReviewerDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <header className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="text-2xl font-bold">
-              <a
-                href="https://a2sv.org"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="cursor-pointer"
-              >
-                <Image
-                  src={"/a2sv_logo.png"}
-                  alt="A2SV"
-                  width={96}
-                  height={96}
-                  className="h-6 w-auto ml-16"
-                />
-              </a>
-            </div>
-            <p className="py-2 border-b-2 border-[#6366F1] text-sm">
-              Dashboard
-            </p>
-            <div className="flex items-center space-x-6 text-sm font-medium">
-              <a
-                href="#"
-                className="py-2 border-b-2 border-transparent text-[#793bf0] hover:text-[#51158C]"
-              >
-                Your Profile
-              </a>
-              <a
-                href="#"
-                className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
-              >
-                {reviewerName}
-              </a>
-              <a
-                href="#"
-                className="py-2 border-b-2 border-transparent text-[#6B7280] hover:underline hover:text-[#829FAB]"
-              >
-                Logout
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header reviewerName={reviewerName} />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-12 mb-24">
