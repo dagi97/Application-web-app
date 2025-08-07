@@ -9,7 +9,14 @@ import {
 import { loginAndStoreToken, updatePassword } from "../lib/redux/utils/login";
 import { useForm } from "react-hook-form";
 import Header from "./Header";
-import { Card, CardHeader, CardTitle, CardContent, Input, Label } from "./Card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Label,
+} from "./Card2";
 import Footer from "./Footer";
 import { Eye, EyeOff } from "lucide-react";
 import Toaster from "./Toaster";

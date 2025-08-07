@@ -1,69 +1,104 @@
-const Card = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <div className={`bg-white rounded-lg shadow-md ${className}`}>{children}</div>
-);
+import * as React from "react";
 
-const CardHeader = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => <div className={`px-6 pt-6 font-bold ${className}`}>{children}</div>;
+import { cn } from "@/lib/utils";
 
-const CardTitle = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <h2 className={`text-xl font-semibold text-gray-800 ${className}`}>
-    {children}
-  </h2>
-);
+// --- Card Components ---
 
-const CardContent = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => <div className={`p-6 ${className}`}>{children}</div>;
+type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
-const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    className="mt-1 block w-full px-4 py-2 bg-white border border-gray-100 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-  />
-);
+function Card({ className, ...props }: CardProps) {
+  return (
+    <div
+      className={cn(
+        "bg-white border border-gray-200 rounded-lg shadow-sm",
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
-const Textarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea
-    {...props}
-    className="mt-2 mb-12 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-    rows={4}
-  />
-);
+function CardHeader({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        "px-6 py-4 border-b border-gray-200 text-center",
+        className
+      )}
+      {...props}
+    />
+  );
+}
 
-const Label = ({
-  children,
-  htmlFor,
-}: {
-  children: React.ReactNode;
-  htmlFor: string;
-}) => (
-  <label
-    htmlFor={htmlFor}
-    className="mb-4 block text-sm font-medium text-gray-700"
-  >
-    {children}
-  </label>
-);
+function CardTitle({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h3 className={cn("text-xl font-bold", className)} {...props} />;
+}
+
+function CardContent({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("px-6 py-6", className)} {...props} />;
+}
+
+// --- Form Components ---
+
+const Input = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ className, type, ...props }, ref) => {
+  return (
+    <input
+      type={type}
+      className={cn(
+        "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+Input.displayName = "Input";
+
+const Textarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <textarea
+      className={cn(
+        "flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+Textarea.displayName = "Textarea";
+
+const Label = React.forwardRef<
+  HTMLLabelElement,
+  React.LabelHTMLAttributes<HTMLLabelElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <label
+      ref={ref}
+      className={cn(
+        "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+Label.displayName = "Label";
 
 export { Card, CardHeader, CardTitle, CardContent, Input, Textarea, Label };
