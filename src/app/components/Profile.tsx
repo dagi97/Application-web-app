@@ -12,7 +12,7 @@ import Header from "./Header";
 import { Card, CardHeader, CardTitle, CardContent, Input, Label } from "./Card";
 import Footer from "./Footer";
 import { Eye, EyeOff } from "lucide-react";
-import Toaster from "./ProfileToaster";
+import Toaster from "./Toaster";
 
 const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -123,11 +123,13 @@ const Profile = () => {
     setProfileUpdateStatus("loading");
     setProfileUpdateMessage("");
     setShowProfileToast(false);
+
+    // FormData for the request body
+    const fd = new FormData();
+    fd.append("full_name", formData.fullName);
+    fd.append("email", formData.email);
     try {
-      const result = await updateProfile({
-        full_name: formData.fullName,
-        email: formData.email,
-      }).unwrap();
+      const result = await updateProfile(fd as any).unwrap();
       if (result && (result as any).success) {
         setProfileUpdateStatus("success");
         setProfileUpdateMessage(
