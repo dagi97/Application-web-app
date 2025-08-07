@@ -20,7 +20,23 @@ export const applicationApi = createApi({
     getApplicationStatus: builder.query<any, void>({
       query: () => "applications/my-status",
     }),
+    submitApplication: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "PATCH",
+      }),
+    }),
+    deleteApplication: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetApplicationStatusQuery } = applicationApi;
+export const {
+  useGetApplicationStatusQuery,
+  useDeleteApplicationMutation,
+  useSubmitApplicationMutation,
+} = applicationApi;
