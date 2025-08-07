@@ -30,7 +30,7 @@ const Alumni = () => {
                     name="Abel Tadesse"
                     title="Software Engineer"
                     company="Google"
-                    image="/abel-tadesse.png"
+                    image="/images/abel-tadesse.png"
 
                 />
                 <TestimonyCard
@@ -43,7 +43,7 @@ const Alumni = () => {
                     name="Abel Tadesse"
                     title="Software Engineer"
                     company="Google"
-                    image="/abel-tadesse.png"
+                    image="/images/abel-tadesse.png"
 
                 />
                 <TestimonyCard
@@ -56,7 +56,7 @@ const Alumni = () => {
                     name="Abel Tadesse"
                     title="Software Engineer"
                     company="Google"
-                    image="/abel-tadesse.png"
+                    image="/images/abel-tadesse.png"
 
                 />
 

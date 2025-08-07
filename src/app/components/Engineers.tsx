@@ -38,7 +38,7 @@ const Engineers = () => {
 
             <Image
                 aria-hidden
-                src="/engineers-discussing-tasks.png"
+                src="/images/engineers-discussing-tasks.png"
                 alt="Engineers discussing tasks"
                 width={300}
                 height={300}
