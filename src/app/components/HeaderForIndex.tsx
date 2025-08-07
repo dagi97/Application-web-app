@@ -100,7 +100,7 @@ const HeaderForIndex = () => {
                             Testimonials
                         </a>
                         <button
-                            className="max-w-[120px] my-2 text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
+                            className="w-[150px] text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             Apply Now
