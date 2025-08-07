@@ -1,7 +1,5 @@
-import Profile from "./components/Profile";
+import Index from "./components";
 
-const page = () => {
-  return <Profile />;
-};
-
-export default page;
+export default function Home() {
+  return <Index />
+}
