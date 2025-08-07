@@ -2,7 +2,7 @@ import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary";
-  size?: "xsmall" | "small" | "default" | "medium"; // Added new sizes
+  size?: "xsmall" | "small" | "default" | "medium" | "applicantForm"; // 👈 Added new size
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -26,6 +26,10 @@ const Button: React.FC<ButtonProps> = ({
     case "medium":
       baseStyle =
         "max-w-[150px] px-5 py-1 rounded-md text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition";
+      break;
+    case "applicantForm":
+      baseStyle =
+        "w-[160px] px-4 py-1.5 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition";
       break;
     default:
       baseStyle =
