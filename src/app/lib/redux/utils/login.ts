@@ -35,6 +35,7 @@ export async function updatePassword({
     };
   }
 }
+
 export async function loginAndStoreToken(email: string, password: string) {
   const res = await fetch("https://a2sv-application-platform-backend-team2.onrender.com/auth/token", {
     method: "POST",
@@ -52,4 +53,19 @@ export async function loginAndStoreToken(email: string, password: string) {
     localStorage.setItem("accessToken", token);
   }
   return token;
+}
+
+export async function fetchReviewerProfile(token: string): Promise<any> {
+  try {
+    const response = await fetch("https://a2sv-application-platform-backend-team2.onrender.com/profile/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) return null;
+    const profile = await response.json();
+    return profile.data || null;
+  } catch {
+    return null;
+  }
 }
