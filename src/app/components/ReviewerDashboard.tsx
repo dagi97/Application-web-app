@@ -22,7 +22,7 @@ export default function ReviewerDashboard() {
 
   // This is a temporary solution for testing purposes (login), change when mixed with others
   useEffect(() => {
-    loginAndStoreToken("abcd@gmail.com", "bezzthegoat").catch(() => {});
+    loginAndStoreToken("abcd@gmail.com", "bezzthegoat!AA").catch(() => {});
   }, []);
 
   useEffect(() => {
