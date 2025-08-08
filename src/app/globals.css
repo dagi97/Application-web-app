@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+td,
+th {
+  /* @apply px-10  */
+  @apply py-2 px-4 border-b-1 border-gray-300
+}
+
+
+td {
+  /* @apply px-10 py-2 */
+}
+
+tr,
+td {
+  @apply min-w-[200px]
+}
+
+
+th {
+  @apply bg-gray-100 font-medium text-xs text-[#6B7280] tracking-wider
+}
+
+table {
+  /* @apply border-2 border-black */
+  @apply max-w-[1px]
+}
+
+.dropdown li {
+  @apply hover:bg-[#0000001A] min-w-[200px] max-w-[200px] h-[44px] opacity-100 rounded-lg pt-3 pr-2 pb-3 pl-4 gap-3 bg-white;
+}
+
+/* .dropdown ul {
+  @apply shadow-lg rounded-lg border border-gray-200;
+} */
+
+
+
+
+summary {
+  @apply mb-5
+}
+
+/* 
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
