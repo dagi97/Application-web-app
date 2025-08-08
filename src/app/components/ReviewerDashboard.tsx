@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useGetAssignedReviewsQuery } from "../lib/redux/api/reviewsApiSlice";
+import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice";
 import { useState, useEffect } from "react";
 import {
   fetchReviewerProfile,
   loginAndStoreToken,
-} from "../lib/redux/utils/login";
+} from "../../lib/redux/utils/login";
 import ApplicationCard from "./ApplicationCard";
 import Header from "./Header";
 
