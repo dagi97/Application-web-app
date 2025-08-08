@@ -7,7 +7,8 @@ export const applicationApi = createApi({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
-        const token = localStorage.getItem("access_token");
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkyYWM3Yi00Y2E2LTQ0Y2YtOGUwZC0wMDdiODA5NzIwNDciLCJleHAiOjE3NTQ1Njk5NDYsInR5cGUiOiJhY2Nlc3MifQ.l2mzwLH2FbUEtoLTlxOdVcFdnwQ40KGv-EnVNgPFq3c";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
@@ -47,6 +48,27 @@ export const applicationApi = createApi({
         body: data,
       }),
     }),
+
+    // ✅ PATCH /manager/applications/:appId/assign
+    assignReviewer: builder.mutation<
+      void,
+      { appId: string; reviewer_id: string }
+    >({
+      query: ({ appId, reviewer_id }) => ({
+        url: `manager/applications/${appId}/assign`,
+        method: "PATCH",
+        body: { reviewer_id },
+      }),
+    }),
+
+    // ✅ POST /applications/
+    submitApplication: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "applications/",
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
@@ -56,4 +78,6 @@ export const {
   useSubmitApplicationFinalMutation,
   useGetApplicationQuery,
   useEditApplicationMutation,
+  useAssignReviewerMutation,
+  useSubmitApplicationMutation,
 } = applicationApi;
