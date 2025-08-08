@@ -4,13 +4,16 @@ import AuthHeader from "@/app/components/AuthHeader";
 import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
-
+import { useAuth } from "@/hooks/useAuth";
 const SignIn = () => {
   type FormData = {
     password: string;
     email: string;
+    rememberMe?: boolean;
   };
-  const onSubmit = (data: any) => {};
+  const onSubmit = (data: FormData) => {
+    login(data);
+  };
   const {
     register,
     handleSubmit,
@@ -18,7 +21,7 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<FormData>();
   const hasError = errors.password || errors.email;
-
+const { login, loading } = useAuth();
   return (
     <div className="bg-[#F9FAFB]">
       <AuthLayout>
@@ -73,9 +76,13 @@ const SignIn = () => {
             <p className="text-red-500 text-xs">{errors.password.message}</p>
           )}
 
-          <div className="w-full mb-[25px] flex justify-between items-center text-sm mt-[25px]">
+          <div className="w-full mb-[25px] flex justify-between items-center text-sm mt-[25px] text-[#111827]">
             <label>
-              <input type="checkbox" className="mr-1 text-[#111827]" />
+              <input
+                type="checkbox"
+                className="mr-1"
+                {...register("rememberMe")}
+              />
               Remember me
             </label>
             <a
@@ -86,7 +93,7 @@ const SignIn = () => {
             </a>
           </div>
 
-          <Button text="Sign In" />
+          <Button text={loading ? "Signing in..." : "Sign In"} disabled={loading} />
         </form>
       </AuthLayout>
     </div>
