@@ -3,13 +3,15 @@ type ButtonProps = {
   icon?: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
+  disabled?: boolean;
 };
 
-export default function Button({ text, icon, onClick, type = 'submit' }: ButtonProps) {
+export default function Button({ text, icon, onClick, disabled, type = 'submit' }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled = {disabled}
       className="w-full h-[38px] relative flex items-center justify-center text-[15px] font-[500] text-white bg-[#4F46E5] hover:bg-[#4338CA] rounded-[6px] px-[17px] py-[9px]"
     >
       {icon && (

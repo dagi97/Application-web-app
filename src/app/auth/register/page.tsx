@@ -1,10 +1,12 @@
 "use client";
+
 import { useForm } from "react-hook-form";
 import AuthHeader from "@/app/components/AuthHeader";
 import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 
 type FormData = {
   name: string;
@@ -12,6 +14,7 @@ type FormData = {
   password: string;
   confirmPassword: string;
 };
+
 const Register = () => {
   const {
     register,
@@ -20,12 +23,19 @@ const Register = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = (data: any) => {
+  const { register: registerUser, loading } = useAuth();
+
+  const onSubmit = (data: FormData) => {
     if (data.password !== data.confirmPassword) {
       alert("Passwords don't match");
       return;
     }
-    // TODO: Handle register logic
+
+    registerUser({
+      full_name: data.name,
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
