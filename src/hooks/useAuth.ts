@@ -1,9 +1,9 @@
 // src/hooks/useAuth.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { apiPost, setLogoutCallback } from "@/app/lib/redux/api/clientApi";
+import { useLoginMutation, useRegisterMutation, setLogoutCallback } from "@/app/lib/redux/api/authApi";
 
 interface LoginData {
   email: string;
@@ -18,16 +18,17 @@ interface RegisterData {
 }
 
 export const useAuth = () => {
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/";
 
+  const [loginMutation, { isLoading: loading }] = useLoginMutation();
+  const [registerMutation] = useRegisterMutation();
+
   const login = async (data: LoginData) => {
-    setLoading(true);
     try {
-      const res = await apiPost("/auth/token/", data);
-      const { access, refresh } = res.data;
+      const res = await loginMutation({ email: data.email, password: data.password }).unwrap();
+      const { access, refresh } = res;
 
       if (data.rememberMe) {
         localStorage.setItem("access_token", access);
@@ -36,27 +37,21 @@ export const useAuth = () => {
         sessionStorage.setItem("access_token", access);
         sessionStorage.setItem("refresh_token", refresh);
       }
-
       router.replace(redirect);
     } catch (err: any) {
-      const msg = err?.response?.data?.message || "Something went wrong";
+      const msg = err?.data?.message || "Login failed";
       alert(msg);
-    } finally {
-      setLoading(false);
     }
   };
 
   const register = async (data: RegisterData) => {
-    setLoading(true);
     try {
-      await apiPost("/auth/register/", data);
+      await registerMutation(data).unwrap();
       alert("Account created! You can now sign in.");
       router.push("/auth/signin");
     } catch (err: any) {
       alert("Registration failed");
-      console.error(err?.response?.data || err.message);
-    } finally {
-      setLoading(false);
+      console.error(err);
     }
   };
 
@@ -67,12 +62,18 @@ export const useAuth = () => {
     sessionStorage.removeItem("refresh_token");
     router.push("/auth/signin");
   };
-  useEffect(() => {
-      setLogoutCallback(logout);
-    }, []);
-  const resetPassword = async (email: string) => {};
 
-  const updatePassword = async (password: string) => {};
+  useEffect(() => {
+    setLogoutCallback(logout);
+  }, []);
+
+  const resetPassword = async (email: string) => {
+    // TODO
+  };
+
+  const updatePassword = async (password: string) => {
+    // TODO
+  };
 
   return {
     login,
