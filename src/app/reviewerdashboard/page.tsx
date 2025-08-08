@@ -99,6 +99,7 @@ export default function ReviewerDashboard() {
           const reviewDetail = reviewDetailsMap[app.application_id];
           if (selectedFilter === "underReview") {
             return (
+              reviewDetail &&
               reviewDetail.review_details != null &&
               app.status !== "accepted" &&
               app.status !== "rejected"
