@@ -1,10 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User } from "@/types/admin/User";
-import { ApiSuccessResponse, GetAllUsersData } from "@/types/admin/api";
+import { ApiSuccessResponse, GetAllUsersData, GetUserByIdResponse } from "@/types/admin/api";
 
 const tempToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ2NzA3MjQsInR5cGUiOiJhY2Nlc3MifQ.uGr5m7HI6BiX-yZ765-ttF-L_Em_EK9ST7LkPikEYVs"; //Replace this with a code that gets the actual token when you get acess to the authSlice
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ2ODAwMjQsInR5cGUiOiJhY2Nlc3MifQ.zrlIxH3Y0YVeevTRtbmv9wDQ0L8Bbu48bWbi3agQx14"; //Replace this with a code that gets the actual token when you get acess to the authSlice
 
 const adminApi = createApi({
   reducerPath: "adminApi",
@@ -73,6 +73,7 @@ getAllUsersForSearch: builder.query<GetAllUsersData, void>({
     //Get user by Id
     getUserById: builder.query({
       query: (user_id) => `/admin/users/${user_id}`,
+      transformResponse: (response: GetUserByIdResponse) => response.data,
       providesTags: (result, error, user_id) => [{ type: "User", id: user_id }],
     }),
 

@@ -56,7 +56,7 @@ const UserTableRow = ( {user} :{user: User}) => {
       </td>
       <td><button className={property}><p>{text}</p></button></td>
       <td>
-        <Link href='/admin/users/edit_user'><button className='text-[#4F46E5] mr-3 text-sm'>Edit</button></Link>
+        <Link href={`/admin/users/edit_user/${user.id}`}><button className='text-[#4F46E5] mr-3 text-sm'>Edit</button></Link>
         <button className='text-[#DC2626] text-sm' onClick={handleDeleteClick}>Delete</button>
       </td>
     </tr>
