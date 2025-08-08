@@ -1,10 +1,10 @@
-<<<<<<< HEAD
-import Index from "./components";
+// <<<<<<< HEAD
+// import Index from "./components";
 
-export default function Home() {
-  return <Index />
-}
-=======
+// export default function Home() {
+//   return <Index />
+// }
+// =======
 
 import AllApplications from "@/components/AllApplications";
 import Header from "@/components/Header";
@@ -17,8 +17,8 @@ export default function DashboardPage() {
     <div className="flex flex-col">
       <Header />
       <main className="
-      /ml-[159px] 
-      mt-[42px]  bg-gray-50 
+      /ml-[159px]
+      mt-[42px]  bg-gray-50
       min-h-screen  px-[100px]
       w-full overflow-auto pt-10">
         <div className="
@@ -41,4 +41,4 @@ export default function DashboardPage() {
     </div>
   );
 }
->>>>>>> my-local-backup
+// >>>>>>> my-local-backup

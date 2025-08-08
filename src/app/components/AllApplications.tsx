@@ -1,6 +1,6 @@
 import React from 'react'
 import DropDown from './DropDown';
-const Row = ({ applicant, submitted, assignedReviewer, status }: any) => {
+const Row = ({ applicant, submitted, assignedReviewer, status, reviewers }: any) => {
     return (
         <tr className='text-left'>
             <td className='font-medium text-left'>{applicant}</td>
@@ -24,18 +24,19 @@ const Row = ({ applicant, submitted, assignedReviewer, status }: any) => {
                 font-semibold
                 '>{status}</button>
                         :
-                        <button className='text-[#1E40AF] bg-[#DBEAFE] px-1 rounded-lg
+                        <button className='text-[#854D0E] bg-[#FEF9C3] px-1 rounded-lg
                 font-semibold
                 '>{status}</button>
                 }
 
             </td>
-            <td className="flex flex-col items-center"><DropDown /></td>
+            <td className="flex flex-col items-center"><DropDown reviewers={reviewers} /></td>
         </tr >
     );
 }
 
-const AllApplications = () => {
+const AllApplications = ({ applications, reviewers }: any) => {
+    console.log(applications)
     return (
         <div className='p-10'>
             <table className="/table-fixed table-auto text-left py-4 px-8">
@@ -49,7 +50,19 @@ const AllApplications = () => {
                     </tr>
                 </thead>
                 <tbody className="text-left py-4 px-8">
-                    <Row
+                    {
+                        Array.isArray(applications) && applications.map((application: any, index: number) => (
+                            <Row
+                                key={index}
+                                applicant={application.applicant_name}
+                                submitted={application.submitted_date}
+                                assignedReviewer={application.assigned_reviewer_name || "Not Assigned"}
+                                status={application.status}
+                                reviewers={reviewers}
+                            />
+                        ))
+                    }
+                    {/* <Row
                         applicant={"Abel Tadesse"}
                         submitted={"Oct 26, 2023"}
                         assignedReviewer={"Jane R."}
@@ -60,7 +73,7 @@ const AllApplications = () => {
                         submitted={"Oct 26, 2023"}
                         assignedReviewer={"Jane R."}
                         status={"New"}
-                    />
+                    /> */}
                 </tbody>
             </table>
         </div>
