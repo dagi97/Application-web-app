@@ -75,9 +75,9 @@ const HeaderReviewDetail = ({
             >
               Dashboard
             </Link>
-            <span className="block text-gray-600 py-2">
+            <Link href={"/profile"} className="block text-gray-600 py-2">
               {reviewerName || "Reviewer"}
-            </span>
+            </Link>
             <button className="block text-gray-600 hover:text-gray-900 py-2">
               Logout
             </button>
