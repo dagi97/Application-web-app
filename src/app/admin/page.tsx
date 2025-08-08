@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import AdminNav from "../components/navigation/AdminNav";
 import SummaryCard from "../components/admin/SummaryCard";
