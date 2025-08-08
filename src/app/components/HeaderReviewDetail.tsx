@@ -42,7 +42,7 @@ const HeaderReviewDetail = ({
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <a
-              href="#"
+              href="/profile"
               className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
             >
               {reviewerName || "Reviewer"}
