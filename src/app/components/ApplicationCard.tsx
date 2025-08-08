@@ -42,26 +42,15 @@ const ApplicationCard: FC<Props> = ({
     });
   }
 
-  // Avatar
+  // temp avatar, check where it is later
   const avatarURL = "/images/person.png";
-
-  // Local status for optimistic UI
-  const [localStatus, setLocalStatus] = useState<Status | null>(null);
   const [reviewDetails, setReviewDetails] = useState<any>(null);
+  const [displayStatus, setDisplayStatus] = useState<Status>(() => {
+    if (status === "accepted" || status === "rejected")
+      return "Review Complete";
+    return "New";
+  });
 
-  // Determine display status
-  let displayStatus: Status;
-  if (localStatus) {
-    displayStatus = localStatus;
-  } else if (status === "accepted" || status === "rejected") {
-    displayStatus = "Review Complete";
-  } else if (status === "under_review") {
-    displayStatus = "Under Review";
-  } else {
-    displayStatus = "New";
-  }
-
-  // Fetch review details for sessionStorage if needed
   useEffect(() => {
     let ignore = false;
     const getDetails = async () => {
@@ -72,16 +61,30 @@ const ApplicationCard: FC<Props> = ({
       const details = await fetchReviewDetails(application_id, token);
       if (!ignore) {
         setReviewDetails(details);
+        if (status !== "accepted" && status !== "rejected") {
+          if (details && details.review_details) {
+            setDisplayStatus("Under Review");
+          } else {
+            setDisplayStatus("New");
+          }
+        }
       }
     };
     getDetails();
     return () => {
       ignore = true;
     };
-  }, [application_id]);
+  }, [application_id, status]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-5 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300">
+      {/* Debug log for reviewDetails - remove later
+      <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-900">
+        <strong>Debug reviewDetails:</strong>
+        <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+          {JSON.stringify(reviewDetails, null, 2)}
+        </pre>
+      </div> */}
       <div>
         <div className="flex items-start gap-4 mb-4">
           <Image
@@ -127,8 +130,6 @@ const ApplicationCard: FC<Props> = ({
             href={`/reviewdetails/${application_id}`}
             onClick={async (e) => {
               e.preventDefault();
-              // Optimistically update status
-              setLocalStatus("Under Review");
               if (onStatusChange) {
                 onStatusChange(application_id, "under_review");
               }
