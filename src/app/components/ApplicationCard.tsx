@@ -1,7 +1,11 @@
 import Image from "next/image";
+<<<<<<< HEAD
 import { FC, useState, useEffect } from "react";
 import { fetchReviewDetails } from "../../lib/redux/utils/login";
 import { useRouter } from "next/navigation";
+=======
+import { FC, useState } from "react";
+>>>>>>> origin/main
 
 type Status = "Under Review" | "Review Complete" | "New";
 interface Application {
@@ -20,6 +24,7 @@ const statusStyles: Record<string, string> = {
 interface Props {
   application: Application;
   onStatusChange?: (application_id: string, newStatus: string) => void;
+<<<<<<< HEAD
   reviewerName: string;
 }
 
@@ -31,6 +36,12 @@ const ApplicationCard: FC<Props> = ({
   const { applicant_name, status, submission_date, application_id } =
     application;
   const router = useRouter();
+=======
+}
+
+const ApplicationCard: FC<Props> = ({ application, onStatusChange }) => {
+  const { applicant_name, status, submission_date } = application;
+>>>>>>> origin/main
 
   let formattedDate = "";
   if (submission_date) {
@@ -43,6 +54,7 @@ const ApplicationCard: FC<Props> = ({
   }
 
   // temp avatar, check where it is later
+<<<<<<< HEAD
   const avatarURL = "/images/person.png";
   const [reviewDetails, setReviewDetails] = useState<any>(null);
   const [displayStatus, setDisplayStatus] = useState<Status>(() => {
@@ -85,6 +97,32 @@ const ApplicationCard: FC<Props> = ({
           {JSON.stringify(reviewDetails, null, 2)}
         </pre>
       </div> */}
+=======
+  const avatarURL = "/abel.png";
+  const [localStatus, setLocalStatus] = useState<Status | null>(null);
+
+  let displayStatus: Status;
+  if (localStatus) {
+    displayStatus = localStatus;
+  } else {
+    switch (status) {
+      case "pending_review":
+        displayStatus = "New";
+        break;
+      case "under_review":
+        displayStatus = "Under Review";
+        break;
+      case "accepted":
+        displayStatus = "Review Complete";
+        break;
+      default:
+        displayStatus = "New";
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-5 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300">
+>>>>>>> origin/main
       <div>
         <div className="flex items-start gap-4 mb-4">
           <Image
@@ -107,6 +145,7 @@ const ApplicationCard: FC<Props> = ({
       </div>
       <div className="mt-6">
         {displayStatus === "Review Complete" ? (
+<<<<<<< HEAD
           <button
             className="w-full text-center px-4 py-2.5 rounded-lg font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
             onClick={() => {
@@ -123,10 +162,14 @@ const ApplicationCard: FC<Props> = ({
               );
             }}
           >
+=======
+          <button className="w-full text-center px-4 py-2.5 rounded-lg font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
+>>>>>>> origin/main
             View Details
           </button>
         ) : (
           <a
+<<<<<<< HEAD
             href={`/reviewdetails/${application_id}`}
             onClick={async (e) => {
               e.preventDefault();
@@ -135,6 +178,13 @@ const ApplicationCard: FC<Props> = ({
               }
               await fetch(
                 `https://a2sv-application-platform-backend-team2.onrender.com/reviews/${application_id}`,
+=======
+            href="#" // Placeholder for review page link
+            onClick={(e) => {
+              e.preventDefault();
+              fetch(
+                `https://a2sv-application-platform-backend-team2.onrender.com/reviews/${application.application_id}`,
+>>>>>>> origin/main
                 {
                   method: "PATCH",
                   headers: {
@@ -143,11 +193,18 @@ const ApplicationCard: FC<Props> = ({
                   body: JSON.stringify({ status: "under_review" }),
                 }
               ).catch(() => {});
+<<<<<<< HEAD
               router.push(
                 `/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName
                 )}`
               );
+=======
+              setLocalStatus("Under Review");
+              if (onStatusChange) {
+                onStatusChange(application.application_id, "under_review");
+              }
+>>>>>>> origin/main
             }}
             className="w-full block text-center px-4 py-2.5 rounded-lg font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200 cursor-pointer"
           >

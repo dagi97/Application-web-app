@@ -1,7 +1,5 @@
-import ReviewerDashboard from "./reviewerdashboard/page";
+import Index from "./components";
 
-const page = () => {
-  return <ReviewerDashboard />;
-};
-
-export default page;
+export default function Home() {
+  return <Index />;
+}
