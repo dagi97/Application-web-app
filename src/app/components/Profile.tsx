@@ -5,8 +5,11 @@ import { useEffect, useState } from "react";
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
-} from "../lib/redux/api/ProfileApiSlice";
-import { loginAndStoreToken, updatePassword } from "../lib/redux/utils/login";
+} from "../../lib/redux/api/ProfileApiSlice";
+import {
+  loginAndStoreToken,
+  updatePassword,
+} from "../../lib/redux/utils/login";
 import { useForm } from "react-hook-form";
 import Header from "./Header";
 import {
