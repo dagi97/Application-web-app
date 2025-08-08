@@ -16,20 +16,35 @@ export const applicationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // ✅ Fetch Application Status (already added)
+    // Fetch Application Status
     getApplicationStatus: builder.query<any, void>({
       query: () => "applications/my-status",
     }),
-    submitApplication: builder.mutation<void, string>({
+    // Submit Application
+    submitApplicationFinal: builder.mutation<void, string>({
       query: (appId) => ({
         url: `applications/${appId}`,
         method: "PATCH",
       }),
     }),
+    //Delete Application
     deleteApplication: builder.mutation<void, string>({
       query: (appId) => ({
         url: `applications/${appId}`,
         method: "DELETE",
+      }),
+    }),
+    // Get a specific application
+    getApplication: builder.query<any, string>({
+      query: (appId) => `applications/${appId}`,
+    }),
+
+    // Update an application
+    editApplication: builder.mutation<void, { appId: string; data: FormData }>({
+      query: ({ appId, data }) => ({
+        url: `applications/${appId}`,
+        method: "PUT",
+        body: data,
       }),
     }),
   }),
@@ -38,5 +53,7 @@ export const applicationApi = createApi({
 export const {
   useGetApplicationStatusQuery,
   useDeleteApplicationMutation,
-  useSubmitApplicationMutation,
+  useSubmitApplicationFinalMutation,
+  useGetApplicationQuery,
+  useEditApplicationMutation,
 } = applicationApi;
