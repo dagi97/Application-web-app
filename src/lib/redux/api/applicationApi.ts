@@ -7,7 +7,7 @@ export const applicationApi = createApi({
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
         const token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NGJmMWUyMy0xM2Q2LTQ1MmQtYTRiNi1jNDVmMmViMTU1YWQiLCJleHAiOjE3NTQ3Mjg0ODQsInR5cGUiOiJhY2Nlc3MifQ.PXmvTRsT5lnboX_HFKcv0KG-k4gtWLRVEojxKaQiZvM";
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkyYWM3Yi00Y2E2LTQ0Y2YtOGUwZC0wMDdiODA5NzIwNDciLCJleHAiOjE3NTQ1Njk5NDYsInR5cGUiOiJhY2Nlc3MifQ.l2mzwLH2FbUEtoLTlxOdVcFdnwQ40KGv-EnVNgPFq3c";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
@@ -31,20 +31,19 @@ export const applicationApi = createApi({
         method: "PATCH",
       }),
     }),
-    // delete an application
+    //Delete Application
     deleteApplication: builder.mutation<void, string>({
       query: (appId) => ({
         url: `applications/${appId}`,
         method: "DELETE",
       }),
     }),
-
-    //  get a specific application
+    // Get a specific application
     getApplication: builder.query<any, string>({
       query: (appId) => `applications/${appId}`,
     }),
 
-    //  edit/update an application
+    // Update an application
     editApplication: builder.mutation<void, { appId: string; data: FormData }>({
       query: ({ appId, data }) => ({
         url: `applications/${appId}`,

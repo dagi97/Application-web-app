@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from "react";
 
 const page = () => {
@@ -5,3 +6,10 @@ const page = () => {
 };
 
 export default page;
+=======
+import Index from "./components";
+
+export default function Home() {
+  return <Index />;
+}
+>>>>>>> main

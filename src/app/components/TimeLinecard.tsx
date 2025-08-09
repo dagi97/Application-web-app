@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import {
   useGetApplicationStatusQuery,
-  useSubmitApplicationMutation,
+  useSubmitApplicationFinalMutation,
   useDeleteApplicationMutation,
 } from "../../lib/redux/api/applicationApi";
 import { CheckCircle } from "lucide-react";
 import Button from "./Button";
 import Toaster from "./Toaster";
+import { useRouter } from "next/navigation";
 
 const TIMELINE_CONFIG = [
   {
@@ -71,9 +72,10 @@ const getStepIcon = (status: string) => {
 };
 
 const TimeLineCard = () => {
-  const [submitApplication] = useSubmitApplicationMutation();
+  const [submitApplication] = useSubmitApplicationFinalMutation();
   const [deleteApplication] = useDeleteApplicationMutation();
   const { data: application, isLoading } = useGetApplicationStatusQuery();
+  const router = useRouter();
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -197,6 +199,9 @@ const TimeLineCard = () => {
                       <Button
                         className="bg-blue-600 text-white hover:bg-blue-700"
                         size="small"
+                        onClick={() => {
+                          router.push("/applicant/edit/personal-info");
+                        }}
                       >
                         Edit
                       </Button>
