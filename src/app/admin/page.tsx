@@ -6,8 +6,13 @@ import SummaryCard from "../components/admin/SummaryCard";
 import ActionCard from "../components/admin/ActionCard";
 import ActivityCard from "../components/admin/ActivityCard";
 import Footer_Variant1 from "../components/footer/footer_variant1";
+import { useGetPaginatedUsersQuery } from "@/lib/redux/api/adminApi";
 
-const page = () => {
+const Page = () => {
+  const {data} = useGetPaginatedUsersQuery({page:1,limit:5})
+  const tot_user = data?.total_count
+
+
   return (
     <div>
 
@@ -20,7 +25,7 @@ const page = () => {
 
           <div className="grid grid-cols-3 gap-7 mb-7">
             <div className="bg-gradient-to-br from-[#6366F1] to-[#9333EA] pt-3 pb-3 pl-4 rounded-md">
-              <SummaryCard title="Total Users" number={125} />
+              <SummaryCard title="Total Users" number={tot_user} />
             </div>
             <div className="bg-gradient-to-br from-[#22C55E] to-[#0D9488] pt-3 pb-3 pl-4 rounded-md">
               <SummaryCard title="Total Applicants" number={1204} />
@@ -56,4 +61,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

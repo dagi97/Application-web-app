@@ -13,6 +13,19 @@ export interface ApiSuccessResponse {
   message: string;
 }
 
+export interface GetUserByIdResponse{
+  success: boolean;
+  data: {
+    id: string;
+    full_name: string,
+    email: string,
+    role: string,
+    profile_picture: string,
+    is_active: boolean
+  }
+  message: string;
+}
+
 export interface GetAllUsersParams {
   page: number;
   limit: number

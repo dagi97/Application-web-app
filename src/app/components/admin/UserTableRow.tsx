@@ -43,8 +43,8 @@ const UserTableRow = ( {user} :{user: User}) => {
   return (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className='flex items-center gap-3'>
-          <img src={user.profile_picture} alt="User Profile" />
+        <div className='md: flex items-center gap-3'>
+          <Image src={user.profile_picture}  alt="User Profile" width={35} height={35} />
           <div>
             <p className='font-bold'>{user.full_name}</p>
             <p className='text-[#6B7280]'>{user.email}</p>
@@ -56,7 +56,7 @@ const UserTableRow = ( {user} :{user: User}) => {
       </td>
       <td><button className={property}><p>{text}</p></button></td>
       <td>
-        <Link href='/admin/users/edit_user'><button className='text-[#4F46E5] mr-3 text-sm'>Edit</button></Link>
+        <Link href={`/admin/users/edit_user/${user.id}`}><button className='text-[#4F46E5] mr-3 text-sm'>Edit</button></Link>
         <button className='text-[#DC2626] text-sm' onClick={handleDeleteClick}>Delete</button>
       </td>
     </tr>

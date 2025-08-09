@@ -10,7 +10,7 @@ import UserTable from "@/app/components/admin/UserTable";
 import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 import Pagination from "@/app/components/admin/Pagination";
 import { useGetPaginatedUsersQuery, useGetAllUsersForSearchQuery } from "@/lib/redux/api/adminApi";
-import { RootState } from "@/lib/redux/store";
+import { RootState } from "@/lib/redux/utils/store";
 import { setSearchText, setRole, setCurrentPage } from "@/lib/redux/slices/admin/filterSlice";
 
 const Page = () => {
