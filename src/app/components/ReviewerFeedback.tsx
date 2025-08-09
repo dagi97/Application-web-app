@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useGetReviewerFeedbackQuery } from "@/lib/redux/api/applicationApi";
+import { useGetReviewerFeedbackQuery } from "@/lib/redux/api/managerApi";
 
 interface ReviewerFeedbackProps {
   applicationId: string;
