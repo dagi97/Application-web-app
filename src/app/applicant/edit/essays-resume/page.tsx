@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Label } from "@/app/components/label";
-import { Progress } from "@/app/components/progress";
-import { Textarea } from "@/app/components/textarea";
+import { Label } from "@/app/components/Label";
+import { Progress } from "@/app/components/Progress";
+import { Textarea } from "@/app/components/Textarea";
 import Button from "@/app/components/Button";
 import Toaster from "@/app/components/Toaster";
 import { useApplicationForm } from "@/hooks/ApplicationFormContext";
