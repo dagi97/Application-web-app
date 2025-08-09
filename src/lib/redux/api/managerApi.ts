@@ -2,7 +2,7 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const applicationApi = createApi({
+export const managerApi = createApi({
   reducerPath: "managerApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
@@ -60,4 +60,4 @@ export const {
   useDecideApplicationMutation,
   useGetAllReviewersQuery,
   useGetApplicationByIdQuery,
-} = applicationApi;
+} = managerApi;

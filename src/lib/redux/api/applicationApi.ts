@@ -55,7 +55,7 @@ export const applicationApi = createApi({
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
         // TODO: Replace hardcoded token with dynamic retrieval (e.g., localStorage)
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3MjAwMDMsInR5cGUiOiJhY2Nlc3MifQ.ygFbDDVzJd_7JZmpyx1PK3eAYlGPIfaJ2Wu5Zq_EOE0";
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3Mjg3MTIsInR5cGUiOiJhY2Nlc3MifQ.t_hJlZl4OGYgn5JRsevmRxSc9nUgpz3o4BWreWrSZS0";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
