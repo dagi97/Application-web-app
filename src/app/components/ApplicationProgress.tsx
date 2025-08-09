@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Header from "./ApplicantHeader";
-import TimeLineCard from "./TimeLineCard";
+import TimeLineCard from "./TimeLinecard";
 import RecentActivity from "./RecentActivity";
 import Footer from "./Footer";
 

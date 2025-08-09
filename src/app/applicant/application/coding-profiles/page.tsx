@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Input } from "@/app/components/input";
+import { Input } from "@/app/components/Input";
 import Button from "@/app/components/Button";
-import { Progress } from "@/app/components/progress";
-import { Label } from "@/app/components/label";
+import { Progress } from "@/app/components/Progress";
+import { Label } from "@/app/components/Label";
 import { useApplicationForm } from "@/lib/context/ApplicationFormContext";
 
 export default function CodingProfilesStep() {
