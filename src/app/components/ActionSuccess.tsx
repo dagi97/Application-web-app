@@ -14,7 +14,7 @@ const ActionSuccess = () => {
           Your password has been reset. You can now log in with your new
           <span className="block">password.</span>
         </p>
-        <Button onClick={() => (window.location.href = "/login")}>
+        <Button onClick={() => (window.location.href = "/auth/signin")}>
           Go to Login
         </Button>
       </div>
