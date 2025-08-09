@@ -24,6 +24,7 @@ export const store = configureStore({
       .concat(profileApi.middleware)
       .concat(reviewsApi.middleware)
       .concat(authApi.middleware)
+      .concat(adminApi.middleware)
  
       .concat(applicationApi.middleware)
       .concat(managerApi.middleware),

@@ -101,7 +101,7 @@ const EditUserForm = ({ userId }: EditUserFormProps) => {
     if (isError) return <div className="text-center p-8 text-red-500">Failed to load user data.</div>;
 
     return (
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl mx-auto">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full mx-auto">
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div>

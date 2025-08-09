@@ -4,7 +4,7 @@ import { User } from "@/types/admin/User";
 import { ApiSuccessResponse, GetAllUsersData, GetUserByIdResponse } from "@/types/admin/api";
 
 const tempToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3MjIxMDksInR5cGUiOiJhY2Nlc3MifQ.02wiGNJYcTVcBnY5SWBxPsqxZyE6yijMW4CvvS0oGqQ"; //Replace this with a code that gets the actual token when you get acess to the authSlice
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3NTc2ODUsInR5cGUiOiJhY2Nlc3MifQ.TPSTdXYEqvGXjx8PiQ6HEbuXnISxY24wfJPNdfl46LQ"; //Replace this with a code that gets the actual token when you get acess to the authSlice
 
 const adminApi = createApi({
   reducerPath: "adminApi",
