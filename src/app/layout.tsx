@@ -1,8 +1,4 @@
 import type { Metadata } from "next";
-<<<<<<< HEAD
-import "../styles/globals.css";
-import ReduxProvider from "@/providers/ReduxProvider";
-=======
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
 import Provider from "../providers/ReduxProvider";
@@ -16,7 +12,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
->>>>>>> main
 
 export const metadata: Metadata = {
   title: "Reviewer Dashboard",
@@ -30,16 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-<<<<<<< HEAD
-      <body>
-        {" "}
-        <ReduxProvider>{children}</ReduxProvider>{" "}
-=======
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Provider>{children}</Provider>
->>>>>>> main
       </body>
     </html>
   );
