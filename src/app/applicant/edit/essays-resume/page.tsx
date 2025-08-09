@@ -46,15 +46,25 @@ export default function EssaysResumeStep() {
     const payload = new FormData();
 
     // Map frontend formData keys to backend API keys
-    payload.append("student_id", formData.id_number);
-    payload.append("school", formData.university);
-    payload.append("degree", formData.degree);
-    payload.append("country", formData.country);
-    payload.append("codeforces_handle", formData.codeforces);
-    payload.append("leetcode_handle", formData.leetcode);
-    payload.append("github", formData.github);
-    payload.append("essay_about_you", formData.essay_question_1);
-    payload.append("essay_why_a2sv", formData.essay_question_2);
+    const mapping: Record<string, string> = {
+      id_number: "student_id",
+      university: "school",
+      degree: "degree",
+      country: "country",
+      codeforces: "codeforces_handle",
+      leetcode: "leetcode_handle",
+      github: "github",
+      essay_question_1: "essay_about_you",
+      essay_question_2: "essay_why_a2sv",
+    };
+
+    // Append only non-empty values to payload
+    Object.entries(mapping).forEach(([formKey, apiKey]) => {
+      const value = formData[formKey as keyof typeof formData];
+      if (value !== "" && value !== null && value !== undefined) {
+        payload.append(apiKey, value as string);
+      }
+    });
 
     if (resumeFile) {
       payload.append("resume", resumeFile);
