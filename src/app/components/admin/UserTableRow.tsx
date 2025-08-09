@@ -44,7 +44,7 @@ const UserTableRow = ( {user} :{user: User}) => {
     <tr>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className='md: flex items-center gap-3'>
-          <img src={user.profile_picture} alt="User Profile" />
+          <Image src={user.profile_picture}  alt="User Profile" width={35} height={35} />
           <div>
             <p className='font-bold'>{user.full_name}</p>
             <p className='text-[#6B7280]'>{user.email}</p>

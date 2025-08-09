@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react'
-import { RootState } from '@/lib/redux/store';
+import { RootState } from '@/lib/redux/utils/store';
 
 interface SearchBarProps {
   searchText: string;
