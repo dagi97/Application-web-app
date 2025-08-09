@@ -7,7 +7,8 @@ export const applicationApi = createApi({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkyYWM3Yi00Y2E2LTQ0Y2YtOGUwZC0wMDdiODA5NzIwNDciLCJleHAiOjE3NTQ1Njk5NDYsInR5cGUiOiJhY2Nlc3MifQ.l2mzwLH2FbUEtoLTlxOdVcFdnwQ40KGv-EnVNgPFq3c";
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNTkyYWM3Yi00Y2E2LTQ0Y2YtOGUwZC0wMDdiODA5NzIwNDciLCJleHAiOjE3NTQ1Njk5NDYsInR5cGUiOiJhY2Nlc3MifQ.l2mzwLH2FbUEtoLTlxOdVcFdnwQ40KGv-EnVNgPFq3c";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
@@ -16,9 +17,36 @@ export const applicationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // ✅ GET /applications/my-status
+    // Fetch Application Status
     getApplicationStatus: builder.query<any, void>({
       query: () => "applications/my-status",
+    }),
+    // Submit Application
+    submitApplicationFinal: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "PATCH",
+      }),
+    }),
+    //Delete Application
+    deleteApplication: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "DELETE",
+      }),
+    }),
+    // Get a specific application
+    getApplication: builder.query<any, string>({
+      query: (appId) => `applications/${appId}`,
+    }),
+
+    // Update an application
+    editApplication: builder.mutation<void, { appId: string; data: FormData }>({
+      query: ({ appId, data }) => ({
+        url: `applications/${appId}`,
+        method: "PUT",
+        body: data,
+      }),
     }),
 
     // ✅ PATCH /manager/applications/:appId/assign
@@ -46,6 +74,10 @@ export const applicationApi = createApi({
 
 export const {
   useGetApplicationStatusQuery,
+  useDeleteApplicationMutation,
+  useSubmitApplicationFinalMutation,
+  useGetApplicationQuery,
+  useEditApplicationMutation,
   useAssignReviewerMutation,
   useSubmitApplicationMutation,
 } = applicationApi;
