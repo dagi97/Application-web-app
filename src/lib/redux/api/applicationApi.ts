@@ -1,4 +1,3 @@
-// lib/redux/api/applicationApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const applicationApi = createApi({
@@ -7,7 +6,8 @@ export const applicationApi = createApi({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
-        const token = localStorage.getItem("access_token");
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NGJmMWUyMy0xM2Q2LTQ1MmQtYTRiNi1jNDVmMmViMTU1YWQiLCJleHAiOjE3NTQ3Mjg0ODQsInR5cGUiOiJhY2Nlc3MifQ.PXmvTRsT5lnboX_HFKcv0KG-k4gtWLRVEojxKaQiZvM";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
@@ -16,34 +16,59 @@ export const applicationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    //  Fetch Application Status
+    // Get application status
     getApplicationStatus: builder.query<any, void>({
       query: () => "applications/my-status",
     }),
-    // Submit Application
-    submitApplication: builder.mutation<void, string>({
+    // Get all active cycles
+    getAllActiveCycle: builder.query<any, void>({
+      query: () => "cycles/active",
+    }),
+    // Submit application
+    submitApplicationFinal: builder.mutation<void, string>({
       query: (appId) => ({
         url: `applications/${appId}`,
         method: "PATCH",
       }),
     }),
-    // Delete Application
+    // delete an application
     deleteApplication: builder.mutation<void, string>({
       query: (appId) => ({
         url: `applications/${appId}`,
         method: "DELETE",
       }),
     }),
-    // Fetch All Cycles
-    getAllCycle: builder.query<any, void>({
-      query: () => "cycles",
+
+    //  get a specific application
+    getApplication: builder.query<any, string>({
+      query: (appId) => `applications/${appId}`,
+    }),
+
+    //  edit/update an application
+    editApplication: builder.mutation<void, { appId: string; data: FormData }>({
+      query: ({ appId, data }) => ({
+        url: `applications/${appId}`,
+        method: "PUT",
+        body: data,
+      }),
+    }),
+    // post a new application
+    submitApplication: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "applications/",
+        method: "POST",
+        body: formData,
+      }),
     }),
   }),
 });
 
 export const {
   useGetApplicationStatusQuery,
-  useDeleteApplicationMutation,
+  useGetAllActiveCycleQuery,
   useSubmitApplicationMutation,
-  useGetAllCycleQuery,
+  useDeleteApplicationMutation,
+  useGetApplicationQuery,
+  useEditApplicationMutation,
+  useSubmitApplicationFinalMutation,
 } = applicationApi;

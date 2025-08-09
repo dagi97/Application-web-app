@@ -3,19 +3,15 @@ import Link from "next/link";
 import { CheckCircle, Circle, ExternalLink, Menu } from "lucide-react";
 import Header from "./ApplicantHeader";
 import React from "react";
-import { useGetAllCycleQuery } from "../../lib/redux/api/applicationApi";
+import { useGetAllActiveCycleQuery } from "../../lib/redux/api/applicationApi";
 import CycleCard from "./CycleCard";
 
 import Footer from "./Footer";
 
 export default function ApplicantDashboard() {
-  const { data, isLoading, error } = useGetAllCycleQuery();
+  const { data, isLoading, error } = useGetAllActiveCycleQuery();
 
-  // Safely extract the cycles array and filter by is_active
-  const cyclesArray = data?.data?.cycles;
-  const activeCycles = Array.isArray(cyclesArray)
-    ? cyclesArray.filter((cycle: any) => cycle.is_active)
-    : [];
+  const activeCycles = data?.data?.cycles || [];
   const completionPercentage = 0;
   const checklistItems = [
     { id: 1, text: "Create an Account", completed: true },
