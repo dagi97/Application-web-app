@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../styles/globals.css";
 import Provider from "../providers/ReduxProvider";
+import { ApplicationFormProviderEdit } from "@/hooks/ApplicationFormContext";
+import { ApplicationFormProvider } from "@/lib/context/ApplicationFormContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Provider>{children}</Provider>
+        <Provider>
+          {" "}
+          <ApplicationFormProviderEdit>
+            <ApplicationFormProvider>{children} </ApplicationFormProvider>
+          </ApplicationFormProviderEdit>
+        </Provider>
       </body>
     </html>
   );

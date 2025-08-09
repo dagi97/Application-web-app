@@ -81,7 +81,7 @@ export default function EssaysResumeStep() {
 
       // ✅ Redirect to dashboard after short delay
       setTimeout(() => {
-        router.push("applicant/dashboard"); // 🔁 Change if your dashboard route is different
+        router.push("/applicant/dashboard"); // 🔁 Change if your dashboard route is different
       }, 1500);
     } catch (err: any) {
       console.error("Submission failed:", err);
