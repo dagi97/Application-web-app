@@ -14,7 +14,7 @@ const Actions = () => {
 }
 
 
-export const DropDown2 = ({ reviewers }: { reviewers: Array<string> }) => {
+export const DropDown2 = ({ reviewers }: any) => {
     return (
         <div className="dropdown">
             <ul tabIndex={0} className="menu bg-base-200 rounded-box dropdown-content z-[1] inline-block ">
@@ -50,7 +50,7 @@ export const DropDown2 = ({ reviewers }: { reviewers: Array<string> }) => {
                                                 className="font-inter font-medium text-[14px] leading-[20px] align-bottom"
                                                 style={{ letterSpacing: '0.01em', color: '#374151' }}
                                             >
-                                                {reviewer}
+                                                {reviewer.full_name}
                                             </span>
                                         </li>
                                     ))}
@@ -64,14 +64,8 @@ export const DropDown2 = ({ reviewers }: { reviewers: Array<string> }) => {
     );
 }
 
-export default function DropDown() {
+export default function DropDown({ reviewers }: any) {
     return (
-        <DropDown2 reviewers={[
-            'Reviewer 1',
-            'Reviewer 2',
-            'Reviewer 3',
-            'Reviewer 4',
-            'Reviewer 5'
-        ]} />
+        <DropDown2 reviewers={reviewers} />
     );
 }

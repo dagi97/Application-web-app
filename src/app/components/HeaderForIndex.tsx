@@ -18,7 +18,7 @@ const HeaderForIndex = () => {
                             className="cursor-pointer"
                         >
                             <Image
-                                src={"/a2sv_logo.png"}
+                                src={"/images/logo.svg"}
                                 alt="A2SV"
                                 width={96}
                                 height={96}

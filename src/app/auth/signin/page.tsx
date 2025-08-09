@@ -5,6 +5,7 @@ import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import { useAuth } from "@/hooks/useAuth";
+import Providers from "@/app/providers/ReduxProvider";
 const SignIn = () => {
   type FormData = {
     password: string;
@@ -21,7 +22,7 @@ const SignIn = () => {
     formState: { errors },
   } = useForm<FormData>();
   const hasError = errors.password || errors.email;
-const { login, loading } = useAuth();
+  const { login, loading } = useAuth();
   return (
     <div className="bg-[#F9FAFB]">
       <AuthLayout>
@@ -100,4 +101,6 @@ const { login, loading } = useAuth();
   );
 };
 
-export default SignIn;
+export default () => (
+  <Providers><SignIn /></Providers>
+)

@@ -1,6 +1,7 @@
 import React from 'react'
 import DropDown from './DropDown';
-const Row = ({ applicant, submitted, assignedReviewer, status, reviewers }: any) => {
+import { useGetApplicationStatusQuery } from '../lib/redux/api/applicationApi';
+const Row = ({ applicant, submitted, assignedReviewer, status, reviewers, appId }: any) => {
     return (
         <tr className='text-left'>
             <td className='font-medium text-left'>{applicant}</td>
@@ -30,7 +31,7 @@ const Row = ({ applicant, submitted, assignedReviewer, status, reviewers }: any)
                 }
 
             </td>
-            <td className="flex flex-col items-center"><DropDown reviewers={reviewers} /></td>
+            <td className="flex flex-col items-center"><DropDown reviewers={reviewers} appId={appId} /></td>
         </tr >
     );
 }
@@ -56,9 +57,10 @@ const AllApplications = ({ applications, reviewers }: any) => {
                                 key={index}
                                 applicant={application.applicant_name}
                                 submitted={application.submitted_date}
-                                assignedReviewer={application.assigned_reviewer_name || "Not Assigned"}
+                                assignedReviewer={application["assigned_reviewer_name"] || "Not Assigned"}
                                 status={application.status}
                                 reviewers={reviewers}
+                                appId={application.id}
                             />
                         ))
                     }
