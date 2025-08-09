@@ -59,6 +59,14 @@ export const applicationApi = createApi({
         body: formData,
       }),
     }),
+    // Assign reviewer to application
+    assignReviewer: builder.mutation<void, { appId: string; reviewer_id: string }>({
+      query: ({ appId, reviewer_id }) => ({
+        url: `manager/applications/${appId}/assign`,
+        method: "PATCH",
+        body: { reviewer_id },
+      }),
+    }),
   }),
 });
 
@@ -70,4 +78,5 @@ export const {
   useGetApplicationQuery,
   useEditApplicationMutation,
   useSubmitApplicationFinalMutation,
+  useAssignReviewerMutation,
 } = applicationApi;
