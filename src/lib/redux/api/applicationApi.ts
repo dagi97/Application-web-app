@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { getSession } from "next-auth/react";
 
 // --- API Slice ---
 
@@ -6,15 +7,14 @@ export const applicationApi = createApi({
   reducerPath: "applicationApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
-    prepareHeaders: (headers) => {
-      if (typeof window !== "undefined") {
-        // TODO: Replace hardcoded token with dynamic retrieval (e.g., localStorage)
-        const token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlN2I0Nzc4My1hMTIzLTQwODEtYjVjYS0zNjAzNDBlNzgyMDMiLCJleHAiOjE3NTQ3Mzg2ODgsInR5cGUiOiJhY2Nlc3MifQ.EbyGg6zzIGpdO6bAOFAhhfY_wZeTxH4OUp-IauX64Rg";
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
+    prepareHeaders: async (headers) => {
+      // ✅ Get the NextAuth session
+      const session = await getSession();
+
+      if (session?.access) {
+        headers.set("Authorization", `Bearer ${session.access}`);
       }
+
       return headers;
     },
   }),

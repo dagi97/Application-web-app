@@ -1,5 +1,5 @@
 // NextAuth configuration and token refresh logic
-import NextAuth, { AuthOptions, User, Account, Profile } from "next-auth"; 
+import NextAuth, { AuthOptions, User, Account, Profile } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -132,7 +132,10 @@ export const authOptions: AuthOptions = {
       }
 
       // If token is still valid, return it unchanged
-      if (typeof token.accessTokenExpires === "number" && Date.now() < token.accessTokenExpires) {
+      if (
+        typeof token.accessTokenExpires === "number" &&
+        Date.now() < token.accessTokenExpires
+      ) {
         return token;
       }
 

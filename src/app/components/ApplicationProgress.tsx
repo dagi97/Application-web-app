@@ -6,11 +6,16 @@ import TimeLineCard from "./TimeLinecard";
 import RecentActivity from "./RecentActivity";
 import Footer from "./Footer";
 
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
+
 export default function ApplicationProgressPage() {
+  const { data: profileData } = useGetProfileQuery();
+
+  const userName = profileData?.data?.full_name || "User";
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Header name="john" />
+      <Header name={userName} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
