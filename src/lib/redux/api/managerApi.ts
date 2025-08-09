@@ -1,6 +1,52 @@
 // lib/redux/api/applicationApi.ts
-
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  mapApiToReviewDetail,
+  ReviewDetail,
+} from "@/lib/redux/types/applicantData";
+
+// --- Interfaces ---
+export interface ApplicantDetails {
+  id: string;
+  applicant_name: string;
+  status: string;
+  school: string;
+  student_id: string;
+  leetcode_handle: string;
+  codeforces_handle: string;
+  essay_why_a2sv: string;
+  essay_about_you: string;
+  resume_url: string;
+  submitted_at: string;
+  updated_at: string;
+}
+
+export interface ReviewDetails {
+  id: string;
+  application_id: string;
+  reviewer_id: string;
+  activity_check_notes: string;
+  resume_score: number;
+  essay_why_a2sv_score: number;
+  essay_about_you_score: number;
+  technical_interview_score: number;
+  behavioral_interview_score: number;
+  interview_notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewData {
+  id: string;
+  applicant_details: ApplicantDetails;
+  review_details: ReviewDetails;
+}
+
+export interface APIResponse<T> {
+  success: boolean;
+  data: T;
+  message: string;
+}
 
 export const managerApi = createApi({
   reducerPath: "managerApi",
@@ -8,7 +54,8 @@ export const managerApi = createApi({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
     prepareHeaders: (headers) => {
       if (typeof window !== "undefined") {
-        const token = localStorage.getItem("access_token");
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3NDQ3ODUsInR5cGUiOiJhY2Nlc3MifQ.Z3gWOGcFlEg4viBsbfK0vwHZ6yhIm3f9lgPbYFA49gg";
         if (token) {
           headers.set("Authorization", `Bearer ${token}`);
         }
@@ -17,14 +64,36 @@ export const managerApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    // Get reviewer feedback
+    getReviewerFeedback: builder.query<APIResponse<ReviewData>, string>({
+      query: (applicationId) => `manager/applications/${applicationId}/`,
+    }),
+
     // Get all reviewers
     getAllReviewers: builder.query<any, void>({
       query: () => "manager/applications/available-reviewers",
     }),
+
     // Get application by ID
     getApplicationById: builder.query<any, string>({
       query: (appId) => `manager/applications/${appId}`,
     }),
+
+    // endpoint for mapped ReviewDetail
+    getMappedReviewDetail: builder.query<ReviewDetail | null, string>({
+      async queryFn(applicationId, _queryApi, _extraOptions, fetchWithBQ) {
+        const res: any = await fetchWithBQ(
+          `manager/applications/${applicationId}`
+        );
+        if (res.error) return { error: res.error };
+
+        if (res.data && res.data.success && res.data.data) {
+          return { data: mapApiToReviewDetail(res.data) };
+        }
+        return { data: null };
+      },
+    }),
+
     // assign reviwer to an application
     assignReviewer: builder.mutation<
       void,
@@ -60,4 +129,6 @@ export const {
   useDecideApplicationMutation,
   useGetAllReviewersQuery,
   useGetApplicationByIdQuery,
+  useGetReviewerFeedbackQuery,
+  useGetMappedReviewDetailQuery,
 } = managerApi;
