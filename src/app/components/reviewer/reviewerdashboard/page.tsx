@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice";
+import { useGetAssignedReviewsQuery } from "../../../../lib/redux/api/reviewsApiSlice";
 import { useState, useEffect } from "react";
-import ApplicationCard from "../components/ApplicationCard";
-import Header from "../components/Header";
+import ApplicationCard from "../../../components/ApplicationCard";
+import Header from "../../../components/Header";
 import {
   fetchReviewerProfile,
   loginAndStoreToken,
   fetchReviewDetails,
-} from "../../lib/redux/utils/login";
+} from "../../../../lib/redux/utils/login";
 
 export default function ReviewerDashboard() {
   const [leftHovered, setLeftHovered] = useState(false);
