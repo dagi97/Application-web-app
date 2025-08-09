@@ -1,12 +1,13 @@
 "use client";
 
-import { Provider } from "react-redux";
-import { store } from "../lib/redux/utils/detailStore";
+import React from "react";
+import { Provider as ReduxProvider } from "react-redux";
+import { store } from "../lib/redux/utils/store"; // adjust path if needed
 
-export default function DetailProvider({
-  children,
-}: {
+interface ReduxProviderProps {
   children: React.ReactNode;
-}) {
-  return <Provider store={store}>{children}</Provider>;
+}
+
+export default function Provider({ children }: ReduxProviderProps) {
+  return <ReduxProvider store={store}>{children}</ReduxProvider>;
 }
