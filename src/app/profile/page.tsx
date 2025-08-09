@@ -11,7 +11,6 @@ import {
   updatePassword,
 } from "../../lib/redux/utils/login";
 import { useForm } from "react-hook-form";
-import Header from "./Header";
 import {
   Card,
   CardHeader,
@@ -19,10 +18,11 @@ import {
   CardContent,
   Input,
   Label,
-} from "./Card2";
-import Footer from "./Footer";
+} from "../components/Card2";
+import Footer from "../components/Footer";
 import { Eye, EyeOff } from "lucide-react";
-import Toaster from "./Toaster";
+import Toaster from "../components/Toaster";
+import Header from "../components/Header";
 
 const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -163,7 +163,7 @@ const Profile = () => {
         setProfileUpdateStatus("error");
         setProfileUpdateMessage(
           (result as any).message ||
-          "Failed to update profile. Please try again."
+            "Failed to update profile. Please try again."
         );
         setShowProfileToast(true);
       }
@@ -248,8 +248,8 @@ const Profile = () => {
       setPasswordChangeStatus("error");
       setPasswordChangeMessage(
         result.details ||
-        result.message ||
-        "Failed to update password. Please check your current password and try again."
+          result.message ||
+          "Failed to update password. Please check your current password and try again."
       );
       setShowPasswordToast(true);
     }

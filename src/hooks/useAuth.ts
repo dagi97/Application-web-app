@@ -3,7 +3,11 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useLoginMutation, useRegisterMutation, setLogoutCallback } from "@/app/lib/redux/api/authApi";
+import {
+  useLoginMutation,
+  useRegisterMutation,
+  setLogoutCallback,
+} from "@/lib/redux/api/authApi";
 
 interface LoginData {
   email: string;
@@ -27,7 +31,10 @@ export const useAuth = () => {
 
   const login = async (data: LoginData) => {
     try {
-      const res = await loginMutation({ email: data.email, password: data.password }).unwrap();
+      const res = await loginMutation({
+        email: data.email,
+        password: data.password,
+      }).unwrap();
       const { access, refresh } = res;
 
       if (data.rememberMe) {

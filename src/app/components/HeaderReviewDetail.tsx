@@ -3,61 +3,57 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
-interface HeaderProps {
-  name: string;
+interface HeaderReviewDetailProps {
+  reviewerName?: string | null;
+  leftHovered?: boolean;
+  onLeftHoverChange?: (hovered: boolean) => void;
 }
 
-const Header = (prop: HeaderProps) => {
+const HeaderReviewDetail = ({
+  reviewerName,
+  leftHovered = false,
+  onLeftHoverChange,
+}: HeaderReviewDetailProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="text-2xl font-bold">
-            <Link
-              href="https://a2sv.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer"
-            >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
-            </Link>
-          </div>
-          <Link
-            href="#"
-            className="py-2 border-b-2 border-blue-500 text-sm hover:text-[#6B7280] hidden md:inline-block"
+          <a
+            href="/"
+            className="flex items-center bg-white"
+            onMouseEnter={() => onLeftHoverChange && onLeftHoverChange(true)}
+            onMouseLeave={() => onLeftHoverChange && onLeftHoverChange(false)}
           >
-            Dashboard
-          </Link>
+            <Image
+              src={
+                leftHovered ? "/images/variant=1.png" : "/images/variant=2.png"
+              }
+              alt="left"
+              width={28}
+              height={28}
+              className="h-5 w-5"
+            />
+            <span className="ml-2 text-sm text-[#6B7280] hover:text-gray-700 hidden sm:inline">
+              Back to Dashboard
+            </span>
+          </a>
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <Link
-              href="/profile"
-              className="py-2 border-b-2 border-transparent text-[#793bf0] hover:text-[#51158C]"
-            >
-              Your Profile
-            </Link>
-            <Link
+            <a
               href="/profile"
               className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
             >
-              {prop.name}
-            </Link>
-            <Link
+              {reviewerName || "Reviewer"}
+            </a>
+            <a
               href="#"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:underline hover:text-[#829FAB]"
             >
               Logout
-            </Link>
+            </a>
           </div>
-
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
@@ -69,24 +65,19 @@ const Header = (prop: HeaderProps) => {
           </div>
         </div>
       </div>
-
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="#" // Fix when you want to link to the dashboard
+              href="/"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
             </Link>
-            <Link
-              href="/profile"
-              className="block text-gray-600 hover:text-gray-900 py-2"
-            >
-              Your Profile
+            <Link href={"/profile"} className="block text-gray-600 py-2">
+              {reviewerName || "Reviewer"}
             </Link>
-            <span className="block text-gray-600 py-2">John Doe</span>
             <button className="block text-gray-600 hover:text-gray-900 py-2">
               Logout
             </button>
@@ -97,4 +88,4 @@ const Header = (prop: HeaderProps) => {
   );
 };
 
-export default Header;
+export default HeaderReviewDetail;

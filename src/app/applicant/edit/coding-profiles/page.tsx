@@ -5,32 +5,45 @@ import { Input } from "@/app/components/Input";
 import Button from "@/app/components/Button";
 import { Progress } from "@/app/components/Progress";
 import { Label } from "@/app/components/Label";
-import { useApplicationForm } from "@/lib/context/ApplicationFormContext";
+import { useApplicationForm } from "@/hooks/ApplicationFormContext";
 
 export default function CodingProfilesStep() {
   const router = useRouter();
-  const { formData, updateFormData } = useApplicationForm(); // ✅ get form state
+  const { formData, updateFormData, isLoading, isError } = useApplicationForm();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    updateFormData({ [name]: value }); // ✅ update context instead of local state
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading application data...</p>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        <p>Error loading application data. Please try again later.</p>
+      </div>
+    );
+  }
 
   const handleNext = () => {
-    router.push("/applicant/application/essays-resume");
+    router.push("/applicant/edit/essays-resume");
   };
 
   const handleBack = () => {
-    router.push("/applicant/application/personal-info");
+    router.push("/applicant/edit/personal-info");
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    updateFormData({ [name]: value });
   };
 
   return (
     <div className="min-h-screen bg-[#f5f6fa] flex items-center justify-center p-6">
-      {/* <HeaderForApplicantForm /> */}
       <form className="bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-2xl p-6 space-y-6">
         <h2 className="text-center text-xl font-semibold">Application Form</h2>
 
-        {/* Progress Bar */}
         <Progress step={2} value={66} className="h-1 bg-gray-200 mb-4" />
 
         {/* Stepper */}
@@ -67,7 +80,7 @@ export default function CodingProfilesStep() {
               <Input
                 id="codeforces"
                 name="codeforces"
-                value={formData.codeforces || ""}
+                value={formData.codeforces}
                 onChange={handleChange}
                 className="bg-white"
                 placeholder="Enter your Codeforces profile"
@@ -79,7 +92,7 @@ export default function CodingProfilesStep() {
               <Input
                 id="leetcode"
                 name="leetcode"
-                value={formData.leetcode || ""}
+                value={formData.leetcode}
                 onChange={handleChange}
                 className="bg-white"
                 placeholder="Enter your LeetCode profile"
@@ -92,7 +105,7 @@ export default function CodingProfilesStep() {
             <Input
               id="github"
               name="github"
-              value={formData.github || ""}
+              value={formData.github}
               onChange={handleChange}
               className="bg-white"
               placeholder="Enter your Github profile"

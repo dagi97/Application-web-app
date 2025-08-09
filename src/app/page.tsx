@@ -1,5 +1,7 @@
 import Index from "./components";
 import DashboardPage from "./components/ManagerDashboard";
+
 export default function Home() {
-  return <DashboardPage />
+  // return <Index />;
+  return <DashboardPage />;
 }

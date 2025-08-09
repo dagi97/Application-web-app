@@ -4,7 +4,8 @@ import AllApplications from "@/app/components/AllApplications";
 import Header from "@/components/Header";
 import StatCard from "@/app/components/StatCard";
 import TeamPerformance from "@/app/components/TeamPerformance";
-import { useAssignReviewerMutation } from "@/app/lib/redux/api/applicationApi";
+import { useAssignReviewerMutation } from "@/lib/redux/api/applicationApi";
+// import { useAssignReviewerMutation } from "@/app/lib/redux/api/applicationApi";
 
 // API base URL
 const API_BASE = "https://a2sv-application-platform-backend.onrender.com";
