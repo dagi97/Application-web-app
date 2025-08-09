@@ -47,7 +47,7 @@ const RecentActivity = () => {
     const { status, submitted_at, updated_at } = application.data;
 
     // Add submission activity if available
-    if (submitted_at) {
+    if (["submitted"].includes(status)) {
       recentActivity.push({
         id: "1",
         title: "Application submitted",
