@@ -52,7 +52,7 @@ const UserTableRow = ( {user} :{user: User}) => {
         </div>
       </td>
       <td>
-        <p className='md: text-[#6B7280] text-sm text-left ml-5'>{user.role.toUpperCase()}</p>
+        <p className='text-[#6B7280] text-sm text-left ml-5'>{user.role.toUpperCase()}</p>
       </td>
       <td><button className={property}><p>{text}</p></button></td>
       <td>
