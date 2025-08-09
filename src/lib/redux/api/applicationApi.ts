@@ -1,5 +1,4 @@
-"use client";
-
+ 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // --- Interfaces ---
@@ -64,9 +63,34 @@ export const applicationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+ 
+    // Get application status
     getApplicationStatus: builder.query<any, void>({
       query: () => "applications/my-status",
     }),
+    // Get all active cycles
+    getAllActiveCycle: builder.query<any, void>({
+      query: () => "cycles/active",
+    }),
+    // Submit application
+    submitApplicationFinal: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "PATCH",
+      }),
+    }),
+    //Delete Application
+    deleteApplication: builder.mutation<void, string>({
+      query: (appId) => ({
+        url: `applications/${appId}`,
+        method: "DELETE",
+      }),
+    }),
+    // Get a specific application
+    getApplication: builder.query<any, string>({
+      query: (appId) => `applications/${appId}`,
+    }),
+ 
 
     submitApplication: builder.mutation<any, FormData>({
       query: (formData) => ({
@@ -75,6 +99,7 @@ export const applicationApi = createApi({
         body: formData,
       }),
     }),
+ 
 
     assignReviewer: builder.mutation<void, { appId: string; reviewer_id: string }>({
       query: ({ appId, reviewer_id }) => ({
@@ -86,6 +111,15 @@ export const applicationApi = createApi({
 
     getReviewerFeedback: builder.query<APIResponse<ReviewData>, string>({
       query: (applicationId) => `manager/applications/${applicationId}/`,
+ 
+    // post a new application
+    submitApplication: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "applications/",
+        method: "POST",
+        body: formData,
+      }),
+ 
     }),
   }),
 });
@@ -94,7 +128,13 @@ export const applicationApi = createApi({
 
 export const {
   useGetApplicationStatusQuery,
-  useSubmitApplicationMutation,
   useAssignReviewerMutation,
   useGetReviewerFeedbackQuery,
+  useGetAllActiveCycleQuery,
+  useSubmitApplicationMutation,
+  useDeleteApplicationMutation,
+  useGetApplicationQuery,
+  useEditApplicationMutation,
+  useSubmitApplicationFinalMutation,
+ 
 } = applicationApi;
