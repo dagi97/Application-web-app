@@ -6,7 +6,7 @@ export const profileApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: 'https://a2sv-application-platform-backend-team2.onrender.com',
     prepareHeaders: (headers) => {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
