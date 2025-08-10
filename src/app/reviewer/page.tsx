@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useGetAssignedReviewsQuery } from "../../../lib/redux/api/reviewsApiSlice";
+import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice";
 import { useState, useEffect } from "react";
-import ApplicationCard from "../../components/ApplicationCard";
-import Header from "../../components/Header";
+import { useSession } from "next-auth/react";
+import ApplicationCard from "../components/ApplicationCard";
+import Header from "../components/Header";
 import {
   fetchReviewerProfile,
-  loginAndStoreToken,
   fetchReviewDetails,
-} from "../../../lib/redux/utils/login";
+} from "../../lib/redux/utils/login";
 
 export default function ReviewerDashboard() {
   const [leftHovered, setLeftHovered] = useState(false);
@@ -25,12 +25,13 @@ export default function ReviewerDashboard() {
     }
   }, [selectedFilter]);
   const [sortBy, setSortBy] = useState("date");
-  const [reviewerName, setReviewerName] = useState("Reviewer");
-
-  // This is a temporary solution for testing purposes (login), change when mixed with others
-  useEffect(() => {
-    loginAndStoreToken("abcd@gmail.com", "bezzthegoat!AA").catch(() => {});
-  }, []);
+  const { data: session } = useSession();
+  const reviewerName =
+    (session?.user && "name" in session.user
+      ? (session.user as { name?: string }).name
+      : undefined) ||
+    session?.user?.email ||
+    "Reviewer";
 
   useEffect(() => {
     const token =
@@ -40,7 +41,6 @@ export default function ReviewerDashboard() {
     if (token) {
       fetchReviewerProfile(token).then((profile) => {
         if (profile) {
-          setReviewerName(profile.full_name || "Reviewer");
         }
       });
     }
@@ -130,7 +130,7 @@ export default function ReviewerDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <Header name={reviewerName} />
+      <Header name={reviewerName} dashboardLink="/reviewer" />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-12 mb-24">

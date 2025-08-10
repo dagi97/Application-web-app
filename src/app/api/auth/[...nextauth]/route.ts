@@ -82,7 +82,7 @@ export const authOptions: AuthOptions = {
 
         const data = await res.json();
 
-        // If login successful, return user object with tokens & role
+        // If login successful, return user object with tokens, role, and name
         if (res.ok && data?.data?.access) {
           return {
             id: credentials?.email || "",
@@ -90,6 +90,7 @@ export const authOptions: AuthOptions = {
             access: data.data.access,
             refresh: data.data.refresh,
             role: data.data.role,
+            name: data.data.full_name || undefined,
             rememberMe: credentials?.rememberMe === "true" || false,
           };
         }
@@ -118,7 +119,7 @@ export const authOptions: AuthOptions = {
 
       // On first sign in, add tokens and role to JWT
       if (user) {
-        const u = user as MyUser;
+        const u = user as MyUser & { name?: string };
         return {
           ...token,
           access: u.access,
@@ -126,6 +127,7 @@ export const authOptions: AuthOptions = {
           accessTokenExpires: Date.now() + 15 * 60 * 1000, // 15 min expiry
           role: u.role,
           email: u.email ?? undefined,
+          name: u.name ?? undefined,
           rememberMe: u.rememberMe ?? false,
           error: null,
         };
@@ -146,9 +148,14 @@ export const authOptions: AuthOptions = {
     // Customize session object sent to client
     async session({ session, token }) {
       session.user = {
+        ...(session.user || {}),
         email: token.email ?? undefined,
         role: typeof token.role === "string" ? token.role : undefined,
       };
+      // Attach name directly to session.user (even if not in type)
+      if (typeof token.name === "string") {
+        (session.user as any).name = token.name;
+      }
       (session as any).access = token.access ?? undefined;
       return session;
     },
