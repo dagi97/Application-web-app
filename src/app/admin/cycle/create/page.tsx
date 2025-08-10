@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { useCreateCycleMutation } from "@/lib/redux/api/adminApi";
 import { useState } from "react";
+import AdminNav from '@/app/components/navigation/AdminNav';
 
 type FormValue = {
   cycle_name: string;
@@ -78,6 +79,7 @@ export default function CreateCycle() {
 
   return (
     <div className="w-full max-w-[1920px] p-4 md:p-10">
+      <AdminNav/>
       <div className="flex flex-col gap-2 mb-6 md:mb-10">
         <h1 className="text-xl md:text-2xl font-bold">Create new cycle</h1>
         <p className="text-sm md:text-base text-gray-600">
