@@ -1,17 +1,19 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { ReviewsResponse } from "../types/reviewData";
+import { getSession } from "next-auth/react";
 
 export const reviewsApi = createApi({
   reducerPath: "reviewsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
-    prepareHeaders: (headers) => {
-      if (typeof window !== "undefined") {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
+    prepareHeaders: async (headers) => {
+     
+      const session = await getSession();
+
+      if (session?.access) {
+        headers.set("Authorization", `Bearer ${session.access}`);
       }
+
       return headers;
     },
   }),
