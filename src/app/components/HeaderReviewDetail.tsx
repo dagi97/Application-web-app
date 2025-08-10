@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
-
+import { signOut } from "next-auth/react";
 interface HeaderReviewDetailProps {
   reviewerName?: string | null;
   leftHovered?: boolean;
@@ -21,7 +21,7 @@ const HeaderReviewDetail = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <a
-            href="/"
+            href="/reviewer"
             className="flex items-center bg-white"
             onMouseEnter={() => onLeftHoverChange && onLeftHoverChange(true)}
             onMouseLeave={() => onLeftHoverChange && onLeftHoverChange(false)}
@@ -50,6 +50,7 @@ const HeaderReviewDetail = ({
             <a
               href="#"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:underline hover:text-[#829FAB]"
+              onClick={() => signOut({ callbackUrl: "/" })}
             >
               Logout
             </a>
@@ -70,7 +71,7 @@ const HeaderReviewDetail = ({
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="/"
+              href="/reviewer"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
@@ -78,7 +79,10 @@ const HeaderReviewDetail = ({
             <Link href={"/profile"} className="block text-gray-600 py-2">
               {reviewerName || "Reviewer"}
             </Link>
-            <button className="block text-gray-600 hover:text-gray-900 py-2">
+            <button
+              className="block text-gray-600 hover:text-gray-900 py-2"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
               Logout
             </button>
           </div>

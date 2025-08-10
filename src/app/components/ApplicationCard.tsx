@@ -110,7 +110,7 @@ const ApplicationCard: FC<Props> = ({
                 );
               }
               router.push(
-                `/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
+                `reviewer/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName
                 )}&readonly=true&status=${status}`
               );
@@ -137,7 +137,7 @@ const ApplicationCard: FC<Props> = ({
                 }
               ).catch(() => {});
               router.push(
-                `/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
+                `reviewer/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName
                 )}`
               );
