@@ -32,7 +32,7 @@ export default function CycleUpdate({ params }: Props) {
     watch,
   } = useForm<FormData>()
 
-  // Fetch cycle data and populate form
+  
   useEffect(() => {
     async function fetchCycle() {
       try {
@@ -93,7 +93,6 @@ export default function CycleUpdate({ params }: Props) {
 
       if (result.success) {
         setSubmitSuccess(true)
-        // Update form with new values
         setValue('name', result.data.name)
         setValue('start_date', result.data.start_date.split('T')[0])
         setValue('end_date', result.data.end_date.split('T')[0])

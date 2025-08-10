@@ -22,12 +22,14 @@ type AnalyticsData = {
 
 const COLORS = ['#6C63FF', '#7E8DFE', '#A28DFF', '#B491FF', '#D4B0FF', '#E9D8FF'];
 
+// Loading Spinner Component
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-screen">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
   </div>
 );
 
+// Error Display Component
 const ErrorDisplay = ({ error }: { error: any }) => (
   <div className="flex justify-center items-center h-screen">
     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md">
@@ -128,7 +130,7 @@ const AnalyticsDashboard = () => {
                   <Tooltip formatter={(value) => [formatNumber(Number(value)), 'Applicants']} />
                   <Legend />
                   <Bar dataKey="value" name="Applicants" fill="#6C63FF" barSize={30} radius={[5, 5, 5, 5]}>
-                    <LabelList dataKey="value" position="right" formatter={(value: number) => formatNumber(value ?? 0)} />
+                    <LabelList dataKey="value" position="right" formatter={(value) => formatNumber(value ?? 0)} />
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
@@ -154,14 +156,14 @@ const AnalyticsDashboard = () => {
                     nameKey="name"
                     labelLine={false}
                     label={({ name, value, percent }) =>
-                      `${name}: ${formatNumber(value ?? 0)} (${((percent ?? 0) * 100).toFixed(1)}%)`
+                      `${name}: ${formatNumber(value)} (${(percent * 100).toFixed(1)}%)`
                     }
                   >
                     {schoolData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value, name, props) => [`${formatNumber(Number(value ?? 0))} (${props.payload.percent}%)`, props.payload.name]} />
+                  <Tooltip formatter={(value, name, props) => [`${formatNumber(Number(value))} (${props.payload.percent}%)`, props.payload.name]} />
                   <Legend layout="horizontal" verticalAlign="bottom" align="center" />
                 </PieChart>
               </ResponsiveContainer>
@@ -192,7 +194,7 @@ const AnalyticsDashboard = () => {
                   {sortedMapData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill="url(#colorUv)" />
                   ))}
-                  <LabelList dataKey="value" position="top" formatter={(value: number) => formatNumber(value ?? 0)} />
+                  <LabelList dataKey="value" position="top" formatter={(value) => formatNumber(value)} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>

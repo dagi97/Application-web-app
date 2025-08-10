@@ -47,8 +47,6 @@ export default function CreateCycle() {
           'Content-Type': 'application/json',
         }
       }).unwrap();
-
-      // Check for success in response if your API returns it
       if (response.success !== false) {
         reset();
         setSubmitSuccess(true);
@@ -60,15 +58,12 @@ export default function CreateCycle() {
       let errorMessage = "Failed to create cycle. Please try again.";
       
       if (err.data) {
-        // Handle structured error response
         errorMessage = err.data.message || 
                        err.data.error || 
                        JSON.stringify(err.data);
       } else if (err.message) {
-        // Handle general error
         errorMessage = err.message;
       } else if (err.status === 'FETCH_ERROR') {
-        // Handle network errors
         errorMessage = "Network error. Please check your connection.";
       }
 
@@ -175,14 +170,12 @@ export default function CreateCycle() {
             </div>
           </div>
 
-          {/* Error Message */}
           {submitError && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
               {submitError}
             </div>
           )}
 
-          {/* Success Message - Only shows after successful submission */}
           {submitSuccess && !isLoading && !submitError && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
               Cycle created successfully!
