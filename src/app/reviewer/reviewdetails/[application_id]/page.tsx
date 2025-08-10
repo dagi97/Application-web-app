@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   mapApiToReviewDetail,
@@ -11,6 +12,7 @@ import ReviewerDetailPage from "../page";
 const ReviewDetailsPage = () => {
   const params = useParams();
   const searchParams = useSearchParams();
+  const { data: session, status: sessionStatus } = useSession();
   const application_id = params?.application_id as string;
   const reviewerName = searchParams?.get("reviewerName") || null;
   const readonly = searchParams?.get("readonly") === "true";
@@ -24,14 +26,13 @@ const ReviewDetailsPage = () => {
       setIsLoading(true);
       setIsError(false);
       try {
-        const token =
-          typeof window !== "undefined"
-            ? localStorage.getItem("access_token")
-            : null;
+        const accessToken = (session as any)?.access;
         const res = await fetch(
           `https://a2sv-application-platform-backend-team2.onrender.com/reviews/${application_id}`,
           {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            headers: accessToken
+              ? { Authorization: `Bearer ${accessToken}` }
+              : {},
           }
         );
         const data = await res.json();
@@ -47,8 +48,8 @@ const ReviewDetailsPage = () => {
         setIsLoading(false);
       }
     }
-    if (application_id) fetchReview();
-  }, [application_id]);
+    if (application_id && sessionStatus === "authenticated") fetchReview();
+  }, [application_id, session, sessionStatus]);
 
   return (
     <ReviewerDetailPage

@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,7 +14,6 @@ import {
 } from "../../components/Card2";
 import type { ReviewDetail } from "../../../lib/redux/types/detailData";
 import { submitReview } from "../../../lib/redux/utils/detailLogin";
-import { loginAndStoreToken } from "../../../lib/redux/utils/login";
 import Toaster from "../../components/Toaster";
 
 interface ReviewerDetailPageProps {
@@ -37,12 +37,12 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
   readonly = false,
   reviewStatus = null,
 }) => {
+  const { data: session, status: sessionStatus } = useSession();
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     reset,
-    watch,
   } = useForm({
     mode: "onChange",
     defaultValues: {
@@ -58,16 +58,6 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error">("success");
-
-  // Fix this with auth when connected
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        loginAndStoreToken("abcd@gmail.com", "bezzthegoat!AA").catch(() => {});
-      }
-    }
-  }, []);
 
   useEffect(() => {
     const details = reviewDetail?.reviewDetails;
@@ -96,6 +86,13 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
 
   const onSubmit = async (data: any) => {
     if (!reviewDetail || !reviewDetail.id) return;
+    const accessToken = (session as any)?.access;
+    if (!accessToken) {
+      setToastMessage("No access token found. Please login again.");
+      setToastType("error");
+      setShowToast(true);
+      return;
+    }
     const payload = {
       activity_check_notes: data.activityCheckNotes,
       resume_score: Number(data.resumeScore),
@@ -105,7 +102,7 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
       behavioral_interview_score: Number(data.behavioralInterviewScore),
       interview_notes: "Good",
     };
-    const result = await submitReview(reviewDetail.id, payload);
+    const result = await submitReview(reviewDetail.id, payload, accessToken);
     if (result.success) {
       setToastMessage("Review submitted successfully!");
       setToastType("success");
