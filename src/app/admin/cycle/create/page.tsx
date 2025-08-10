@@ -1,211 +1,419 @@
-'use client'
-import { useForm } from "react-hook-form";
-import { useAppSelector } from "@/lib/redux/hooks";
-import { useCreateCycleMutation } from "@/lib/redux/api/adminApi";
-import { useState } from "react";
-import AdminNav from '@/app/components/navigation/AdminNav';
+"use client";
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  useGetCyclesQuery,
+  useActivateCycleMutation,
+  useDeactivateCycleMutation,
+  useDeleteCycleMutation,
+} from "@/lib/redux/api/adminApi";
+import AdminNav from "@/app/components/navigation/AdminNav";
+import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 
-type FormValue = {
-  cycle_name: string;
-  country: string;
+type Cycle = {
+  id: string;
+  name: string;
   start_date: string;
   end_date: string;
+  is_active: boolean;
+  created_at: string;
 };
 
-export default function CreateCycle() {
-  const [createCycle, { isLoading }] = useCreateCycleMutation();
-  const { accessToken } = useAppSelector((state) => state.auth);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<FormValue>({
-    mode: "onChange",
-    defaultValues: {
-      country: "",
-    },
+type Pagination = {
+  page: number;
+  limit: number;
+};
+
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+  </div>
+);
+
+const ErrorDisplay = ({ error }: { error: any }) => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <strong>Error:</strong> {error?.message || "Failed to load cycles"}
+    </div>
+  </div>
+);
+
+const SuccessAlert = ({ message }: { message: string }) => (
+  <div className="fixed top-4 right-4 z-50">
+    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+      {message}
+    </div>
+  </div>
+);
+
+const ErrorAlert = ({ message }: { message: string }) => (
+  <div className="fixed top-4 right-4 z-50">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      {message}
+    </div>
+  </div>
+);
+
+const CycleCard = ({
+  cycle,
+  onActivate,
+  onDeactivate,
+  onDelete,
+  isActivating,
+  isDeactivating,
+  isDeleting,
+  deleteError,
+}: {
+  cycle: Cycle;
+  onActivate: (id: string) => void;
+  onDeactivate: (id: string) => void;
+  onDelete: (id: string) => void;
+  isActivating: boolean;
+  isDeactivating: boolean;
+  isDeleting: boolean;
+  deleteError?: string | null;
+}) => {
+  const generationMatch = cycle.name.match(/G(\d+)/);
+  const generationNumber = generationMatch ? parseInt(generationMatch[1]) : 0;
+  const ordinal =
+    [
+      "first",
+      "second",
+      "third",
+      "fourth",
+      "fifth",
+      "sixth",
+      "seventh",
+      "eighth",
+      "ninth",
+      "tenth",
+    ][generationNumber - 1] || "";
+
+  // Randomly select a country
+  const countries = ["Ethiopia", "Kenya", "Nigeria", "Ghana"];
+  const country = countries[Math.floor(Math.random() * countries.length)];
+
+  return (
+    <div>
+      <div className="relative w-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+        {deleteError && (
+          <div className="mb-2 p-2 text-sm text-red-600 bg-red-50 rounded">
+            {deleteError}
+          </div>
+        )}
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-xl font-semibold text-gray-900">{cycle.name}</h3>
+          <div className="flex space-x-2">
+            {cycle.is_active ? (
+              <button
+                className="px-3 py-1 text-sm text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                onClick={() => onDeactivate(cycle.id)}
+                disabled={isDeactivating}
+              >
+                {isDeactivating ? "Deactivating..." : "close"}
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                onClick={() => onActivate(cycle.id)}
+                disabled={isActivating}
+              >
+                {isActivating ? "Activating..." : "Activate"}
+              </button>
+            )}
+            <Link
+              className="px-3 py-1 text-sm text-white bg-orange-500 rounded-md hover:bg-orange-600"
+              href={`/admin/cycle/${cycle.id}`}
+            >
+              Edit
+            </Link>
+            <button
+              className="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600 disabled:opacity-50"
+              onClick={() => onDelete(cycle.id)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+        </div>
+        <p className="text-gray-600 mb-4">
+          {ordinal ? `The ${ordinal} generation of A2SVians` : cycle.name}
+        </p>
+        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+          {/* Country replaces status */}
+          <div className="text-sm text-gray-500">
+            Country: <span className="font-semibold">{country}</span>
+          </div>
+          {/* Status replaces date */}
+          <div className="text-sm">
+            Status:{" "}
+            <span
+              className={
+                cycle.is_active
+                  ? "text-green-600 font-semibold"
+                  : "text-red-600 font-semibold"
+              }
+            >
+              {cycle.is_active ? "Active" : "Closed"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function PaginatedCycles() {
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    limit: 4,
   });
+  const [currentDeletingId, setCurrentDeletingId] = useState<string | null>(
+    null
+  );
+  const [currentActingId, setCurrentActingId] = useState<string | null>(null);
+  const [alert, setAlert] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
-  const onSubmit = async (data: FormValue) => {
-    setSubmitSuccess(false);
-    setSubmitError(null);
-    
+  const router = useRouter();
+
+  const {
+    data: cyclesData,
+    isLoading,
+    error: fetchError,
+    isFetching,
+    refetch,
+  } = useGetCyclesQuery(pagination);
+
+  const [activateCycle, { isLoading: isActivating }] =
+    useActivateCycleMutation();
+  const [deactivateCycle, { isLoading: isDeactivating }] =
+    useDeactivateCycleMutation();
+  const [deleteCycle, { isLoading: isDeleting, error: deleteErrorRaw }] =
+    useDeleteCycleMutation();
+
+  const deleteError = deleteErrorRaw
+    ? (deleteErrorRaw as any).data?.message || "Failed to delete cycle"
+    : null;
+
+  const showAlert = (type: "success" | "error", message: string) => {
+    setAlert({ type, message });
+    setTimeout(() => setAlert(null), 5000);
+  };
+
+  const handleActivate = async (cycleId: string) => {
     try {
-      const payload = {
-        name: data.cycle_name,
-        start_date: data.start_date,
-        end_date: data.end_date,
-      };
-
-      const response = await createCycle({
-        body: payload,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        }
-      }).unwrap();
-      if (response.success !== false) {
-        reset();
-        setSubmitSuccess(true);
-      } else {
-        throw new Error(response.message || "Failed to create cycle");
-      }
-    } catch (err: any) {
-      console.error("API Error:", err);
-      let errorMessage = "Failed to create cycle. Please try again.";
-      
-      if (err.data) {
-        errorMessage = err.data.message || 
-                       err.data.error || 
-                       JSON.stringify(err.data);
-      } else if (err.message) {
-        errorMessage = err.message;
-      } else if (err.status === 'FETCH_ERROR') {
-        errorMessage = "Network error. Please check your connection.";
-      }
-
-      setSubmitError(errorMessage);
+      setCurrentActingId(cycleId);
+      await activateCycle(cycleId).unwrap();
+      showAlert("success", "Cycle activated successfully");
+      refetch();
+    } catch (error: any) {
+      showAlert("error", error.data?.message || "Failed to activate cycle");
+    } finally {
+      setCurrentActingId(null);
     }
   };
 
+  const handleDeactivate = async (cycleId: string) => {
+    try {
+      setCurrentActingId(cycleId);
+      await deactivateCycle(cycleId).unwrap();
+      showAlert("success", "Cycle deactivated successfully");
+      refetch();
+    } catch (error: any) {
+      showAlert("error", error.data?.message || "Failed to deactivate cycle");
+    } finally {
+      setCurrentActingId(null);
+    }
+  };
+
+  const handleDelete = async (cycleId: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this cycle? This action cannot be undone."
+      )
+    ) {
+      setCurrentDeletingId(cycleId);
+      try {
+        const result = await deleteCycle(cycleId).unwrap();
+        if (result.success) {
+          showAlert("success", "Cycle deleted successfully");
+          refetch();
+        } else {
+          showAlert("error", result.message || "Failed to delete cycle");
+        }
+      } catch (error: any) {
+        showAlert("error", error.data?.message || "Failed to delete cycle");
+      } finally {
+        setCurrentDeletingId(null);
+      }
+    }
+  };
+
+  if (isLoading) return <LoadingSpinner />;
+  if (fetchError) return <ErrorDisplay error={fetchError} />;
+
+  const { cycles = [], total_count = 0 } = cyclesData?.data || {};
+  const totalPages = Math.ceil(total_count / pagination.limit);
+
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+  };
+
   return (
-    <div className="w-full max-w-[1920px] p-4 md:p-10">
-      <AdminNav/>
-      <div className="flex flex-col gap-2 mb-6 md:mb-10">
-        <h1 className="text-xl md:text-2xl font-bold">Create new cycle</h1>
-        <p className="text-sm md:text-base text-gray-600">
-          Use this form to create a new cycle and assign periods.
-        </p>
-      </div>
+    <div className="flex flex-col min-h-screen">
+      {alert &&
+        (alert.type === "success" ? (
+          <SuccessAlert message={alert.message} />
+        ) : (
+          <ErrorAlert message={alert.message} />
+        ))}
+      <AdminNav />
+      <div className="flex flex-col items-start px-4 py-10 gap-8 w-full max-w-7xl mx-auto">
+        <div className="flex flex-row items-center justify-between w-full">
+          <h1 className="font-bold text-3xl text-gray-900">
+            Application Cycles
+          </h1>
+          <Link
+            href="/admin/cycle/create"
+            className="flex items-center justify-center px-4 py-2 bg-indigo-600 rounded-md text-white hover:bg-indigo-700 transition-colors"
+          >
+            Create New Cycle
+          </Link>
+        </div>
 
-      <div className="w-full max-w-[1216px] p-4 md:p-6 rounded-lg bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.1)]">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                Cycle name
-              </label>
-              <input
-                type="text"
-                className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
-                  errors.cycle_name ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("cycle_name", { required: "Cycle name is required" })}
-                placeholder="Enter cycle name"
-              />
-              {errors.cycle_name && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.cycle_name.message}
-                </p>
-              )}
-            </div>
+        <div className="flex flex-col items-center w-full py-10 gap-10">
+          <div className="flex flex-col items-start w-full gap-8">
+            {cycles.length === 0 ? (
+              <div className="w-full text-center py-10">
+                <p className="text-gray-500">No cycles found</p>
+                <Link
+                  href="/admin/cycle/create"
+                  className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                >
+                  Create New Cycle
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                  {cycles.map((cycle) => (
+                    <CycleCard
+                      key={cycle.id}
+                      cycle={cycle}
+                      onActivate={handleActivate}
+                      onDeactivate={handleDeactivate}
+                      onDelete={handleDelete}
+                      isActivating={
+                        isActivating && currentActingId === cycle.id
+                      }
+                      isDeactivating={
+                        isDeactivating && currentActingId === cycle.id
+                      }
+                      isDeleting={isDeleting && currentDeletingId === cycle.id}
+                      deleteError={
+                        currentDeletingId === cycle.id ? deleteError : null
+                      }
+                    />
+                  ))}
+                </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                Country
-              </label>
-              <select
-                className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
-                  errors.country ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("country", { required: "Country is required" })}
-              >
-                <option value="" disabled>Select a country</option>
-                <option value="ethiopia">Ethiopia</option>
-                <option value="kenya">Kenya</option>
-                <option value="nigeria">Nigeria</option>
-                <option value="ghana">Ghana</option>
-              </select>
-              {errors.country && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.country.message}
-                </p>
-              )}
-            </div>
+                <div className="w-full mt-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+                    <p className="text-sm text-gray-700">
+                      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                      {Math.min(
+                        pagination.page * pagination.limit,
+                        total_count
+                      )}{" "}
+                      of {total_count} results
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handlePageChange(pagination.page - 1)}
+                        disabled={pagination.page === 1}
+                        className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-l-md disabled:opacity-50 hover:bg-gray-50"
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12.5 15L7.5 10L12.5 5"
+                            stroke="#6B7280"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                Start date
-              </label>
-              <input
-                type="date"
-                className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
-                  errors.start_date ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("start_date", { required: "Start date is required" })}
-              />
-              {errors.start_date && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.start_date.message}
-                </p>
-              )}
-            </div>
+                      {Array.from(
+                        { length: Math.min(5, totalPages) },
+                        (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (pagination.page <= 3) {
+                            pageNum = i + 1;
+                          } else if (pagination.page >= totalPages - 2) {
+                            pageNum = totalPages - 4 + i;
+                          } else {
+                            pageNum = pagination.page - 2 + i;
+                          }
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                End date
-              </label>
-              <input
-                type="date"
-                className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
-                  errors.end_date ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("end_date", {
-                  required: "End date is required",
-                  validate: (value, { start_date }) => {
-                    if (start_date && value <= start_date) {
-                      return "End date must be after start date";
-                    }
-                    return true;
-                  },
-                })}
-              />
-              {errors.end_date && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.end_date.message}
-                </p>
-              )}
-            </div>
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => handlePageChange(pageNum)}
+                              className={`px-3 py-1 h-10 font-medium text-sm ${
+                                pagination.page === pageNum
+                                  ? "bg-indigo-50 border border-indigo-500 text-indigo-600"
+                                  : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        }
+                      )}
+
+                      <button
+                        onClick={() => handlePageChange(pagination.page + 1)}
+                        disabled={pagination.page === totalPages}
+                        className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-r-md disabled:opacity-50 hover:bg-gray-50"
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.5 15L12.5 10L7.5 5"
+                            stroke="#6B7280"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-
-          {submitError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
-              {submitError}
-            </div>
-          )}
-
-          {submitSuccess && !isLoading && !submitError && (
-            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
-              Cycle created successfully!
-            </div>
-          )}
-
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              className="px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={() => {
-                reset();
-                setSubmitError(null);
-                setSubmitSuccess(false);
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Saving..." : "Save Cycle"}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
+      <Footer_Variant1 />
     </div>
   );
 }
