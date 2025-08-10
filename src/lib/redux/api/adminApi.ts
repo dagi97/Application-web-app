@@ -2,7 +2,11 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { getSession } from "next-auth/react";
 import { User } from "@/types/admin/User";
-import { ApiSuccessResponse, GetAllUsersData, GetUserByIdResponse } from "@/types/admin/api";
+import {
+  ApiSuccessResponse,
+  GetAllUsersData,
+  GetUserByIdResponse,
+} from "@/types/admin/api";
 
 export interface AnalyticsData {
   total_applicants: number;
@@ -41,20 +45,18 @@ type CyclesResponse = {
 // ================= SIMPLIFIED BASE QUERY =================
 const baseUrl = "https://a2sv-application-platform-backend-team2.onrender.com";
 
-
 const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: async (headers) => {
-      const session = await getSession();
+    const session = await getSession();
 
-      if (session?.access) {
-        headers.set("Authorization", `Bearer ${session.access}`);
-      }
+    if (session?.access) {
+      headers.set("Authorization", `Bearer ${session.access}`);
+    }
 
-      return headers;
-    },
+    return headers;
+  },
 });
-
 
 // ================= API =================
 export const adminApi = createApi({
@@ -62,7 +64,6 @@ export const adminApi = createApi({
   baseQuery: baseQuery,
   tagTypes: ["User", "Cycle"],
   endpoints: (builder) => ({
-
     // ===== USER MANAGEMENT =====
     createUser: builder.mutation({
       query: (newUser) => ({
@@ -135,49 +136,48 @@ export const adminApi = createApi({
     }),
 
     // ===== CYCLE MANAGEMENT =====
-    getCycles: builder.query<CyclesResponse, { page: number; limit: number }>(
-      {
-        query: ({ page, limit }) => ({
-          url: "/cycle",
-          method: "GET",
-          params: { page, limit },
-        }),
-        providesTags: (result) =>
-          result?.success
-            ? [
-                ...result.data.cycles.map(({ id }) => ({
-                  type: "Cycle" as const,
-                  id,
-                })),
-                { type: "Cycle", id: "LIST" },
-              ]
-            : [{ type: "Cycle", id: "LIST" }],
-      }
-    ),
+    getCycles: builder.query<CyclesResponse, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
+        url: "/cycles",
+        method: "GET",
+        params: { page, limit },
+      }),
+      providesTags: (result) =>
+        result?.success
+          ? [
+              ...result.data.cycles.map(({ id }) => ({
+                type: "Cycle" as const,
+                id,
+              })),
+              { type: "Cycle", id: "LIST" },
+            ]
+          : [{ type: "Cycle", id: "LIST" }],
+    }),
 
-    getActiveCycles: builder.query<CyclesResponse, { page: number; limit: number }>(
-      {
-        query: ({ page, limit }) => ({
-          url: "/cycles/active",
-          method: "GET",
-          params: { page, limit },
-        }),
-        providesTags: (result) =>
-          result?.success
-            ? [
-                ...result.data.cycles.map(({ id }) => ({
-                  type: "Cycle" as const,
-                  id,
-                })),
-                { type: "Cycle", id: "ACTIVE_LIST" },
-              ]
-            : [{ type: "Cycle", id: "ACTIVE_LIST" }],
-      }
-    ),
+    getActiveCycles: builder.query<
+      CyclesResponse,
+      { page: number; limit: number }
+    >({
+      query: ({ page, limit }) => ({
+        url: "/cycles/active",
+        method: "GET",
+        params: { page, limit },
+      }),
+      providesTags: (result) =>
+        result?.success
+          ? [
+              ...result.data.cycles.map(({ id }) => ({
+                type: "Cycle" as const,
+                id,
+              })),
+              { type: "Cycle", id: "ACTIVE_LIST" },
+            ]
+          : [{ type: "Cycle", id: "ACTIVE_LIST" }],
+    }),
 
     createCycle: builder.mutation({
       query: (body) => ({
-        url: "/admin/cycle",
+        url: "/admin/cycles",
         method: "POST",
         body,
       }),
@@ -193,16 +193,17 @@ export const adminApi = createApi({
       invalidatesTags: (result, error, { id }) => [{ type: "Cycle", id }],
     }),
 
-    deleteCycle: builder.mutation<{ success: boolean; message: string }, string>({
+    deleteCycle: builder.mutation<
+      { success: boolean; message: string },
+      string
+    >({
       query: (id) => ({
         url: `/admin/cycles/${id}`,
         method: "DELETE",
       }),
-      transformErrorResponse: (
-        response: FetchBaseQueryError
-      ) => {
+      transformErrorResponse: (response: FetchBaseQueryError) => {
         const errorData = response.data as { message?: string };
-        
+
         return {
           success: false,
           message: errorData?.message || "Failed to delete cycle",
@@ -233,7 +234,10 @@ export const adminApi = createApi({
     // ===== ANALYTICS =====
     getAnalytics: builder.query<AnalyticsData, void>({
       query: () => "/admin/analytics",
-      transformResponse: (response: { success: boolean; data: AnalyticsData }) => {
+      transformResponse: (response: {
+        success: boolean;
+        data: AnalyticsData;
+      }) => {
         if (!response.success) throw new Error("Failed to fetch analytics");
         return response.data;
       },
