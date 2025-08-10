@@ -1,8 +1,9 @@
 'use client'
-import { useEffect, useState,use } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAppSelector } from '@/lib/redux/hooks'
 import { useUpdateCycleMutation } from '@/lib/redux/api/adminApi'
+import { useParams } from 'next/navigation'
 
 type FormData = {
   name: string;
@@ -10,12 +11,9 @@ type FormData = {
   end_date: string;
 };
 
-interface Props {
-  params: Promise<{ cycle_id: string }>
-}
-
-export default function CycleUpdate({ params }: Props) {
-  const { cycle_id } = use(params)
+export default function CycleUpdate() {
+  const params = useParams();
+  const cycle_id = params?.cycle_id || ''
   const { accessToken } = useAppSelector((state) => state.auth)
   const [loading, setLoading] = useState(true)
   const [submitSuccess, setSubmitSuccess] = useState(false)
@@ -32,9 +30,13 @@ export default function CycleUpdate({ params }: Props) {
     watch,
   } = useForm<FormData>()
 
-  
   useEffect(() => {
     async function fetchCycle() {
+      if (!cycle_id) {
+        setFetchError('No cycle ID provided')
+        setLoading(false)
+        return
+      }
       try {
         const response = await fetch(
           `https://a2sv-application-platform-backend-team2.onrender.com/cycles/${cycle_id}`,

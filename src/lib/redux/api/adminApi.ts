@@ -138,7 +138,7 @@ export const adminApi = createApi({
     getCycles: builder.query<CyclesResponse, { page: number; limit: number }>(
       {
         query: ({ page, limit }) => ({
-          url: "/cycle",
+          url: "/cycles",
           method: "GET",
           params: { page, limit },
         }),
@@ -177,7 +177,7 @@ export const adminApi = createApi({
 
     createCycle: builder.mutation({
       query: (body) => ({
-        url: "/admin/cycle",
+        url: "/admin/cycles",
         method: "POST",
         body,
       }),
