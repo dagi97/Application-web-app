@@ -103,6 +103,7 @@ const Profile = () => {
       });
     }
   }, [profile, resetProfileForm]);
+  const dashlink = profile?.role ? `/${profile.role}/dashboard` : "/dashboard";
 
   const {
     register: registerPassword,
@@ -259,6 +260,7 @@ const Profile = () => {
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
       <Header
         name={isLoading ? "Loading..." : profile?.full_name || "User"}
+        dashboardLink={dashlink}
       ></Header>
       <main className="flex-1 mt-10">
         <div className="max-w-5xl mx-auto px-0 sm:px-6 lg:px-8">

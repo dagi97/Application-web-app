@@ -5,14 +5,36 @@ import Header from "./ApplicantHeader";
 import React from "react";
 import { useGetAllActiveCycleQuery } from "../../lib/redux/api/applicationApi";
 import CycleCard from "./CycleCard";
-
-import Footer from "./Footer";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 
 export default function ApplicantDashboard() {
   const { data, isLoading, error } = useGetAllActiveCycleQuery();
+  const { data: profileData } = useGetProfileQuery();
+  // Add this inside your component, after getting profileData:
+  const profile = profileData?.data || {};
+
+  function calculateCompletion(profile: any) {
+    if (!profile) return 0;
+
+    const fields = ["full_name", "email", "role", "profile_picture_url", "id"];
+
+    let completedCount = 0;
+
+    fields.forEach((field) => {
+      if (profile[field] && profile[field] !== "") {
+        completedCount++;
+      }
+    });
+
+    return Math.round((completedCount / fields.length) * 100);
+  }
+
+  const completionPercentage = calculateCompletion(profile);
+
+  const userName = profileData?.data?.full_name || "User";
 
   const activeCycles = data?.data?.cycles || [];
-  const completionPercentage = 0;
+
   const checklistItems = [
     { id: 1, text: "Create an Account", completed: true },
     { id: 2, text: "Fill Personal Information", completed: false },
@@ -29,13 +51,13 @@ export default function ApplicantDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Header name="John" />
+      <Header name={userName} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-            Welcome, John!
+            Welcome, {userName}!
           </h1>
           <p className="text-gray-600">
             Your journey to a global tech career starts now.
@@ -90,7 +112,7 @@ export default function ApplicantDashboard() {
                     </div>
                   </div>
                   <Link
-                    href="/applicant/profile"
+                    href="/profile"
                     className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                   >
                     Go to profile →

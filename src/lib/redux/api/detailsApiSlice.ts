@@ -1,14 +1,14 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const detailsApi = createApi({
-  reducerPath: 'detailsApi',
+  reducerPath: "detailsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://a2sv-application-platform-backend-team2.onrender.com/',
+    baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
     prepareHeaders: (headers) => {
-      if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('reviewer_token');
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("reviewer_token");
         if (token) {
-          headers.set('Authorization', `Bearer ${token}`);
+          headers.set("Authorization", `Bearer ${token}`);
         }
       }
       return headers;
