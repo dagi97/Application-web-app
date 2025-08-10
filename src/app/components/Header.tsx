@@ -24,13 +24,7 @@ const Header = (prop: HeaderProps) => {
               rel="noopener noreferrer"
               className="cursor-pointer"
             >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
+              <img src={"/a2sv-logo.svg"} />
             </Link>
           </div>
           <Link

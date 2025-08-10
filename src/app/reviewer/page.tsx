@@ -5,6 +5,7 @@ import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice"
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ApplicationCard from "../components/ApplicationCard";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 import Header from "../components/Header";
 import {
   fetchReviewerProfile,
@@ -13,16 +14,14 @@ import {
 
 export default function ReviewerDashboard() {
   const { data: session } = useSession();
+  const { data: profileData } = useGetProfileQuery();
   const [leftHovered, setLeftHovered] = useState(false);
   const [rightHovered, setRightHovered] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "underReview" | "complete"
   >("all");
   const [sortBy, setSortBy] = useState("date");
-  const reviewerName =
-    (session?.user && "name" in session.user
-      ? (session.user as { name?: string }).name
-      : undefined) || "Reviewer";
+  const reviewerName = profileData?.data.full_name || "Reviewer";
 
   useEffect(() => {
     setCurrentPage(1);
