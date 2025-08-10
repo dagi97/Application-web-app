@@ -3,13 +3,13 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 
-interface HeaderProps {
-  name: string;
-}
-
-const Header = (prop: HeaderProps) => {
+const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { data: profileData } = useGetProfileQuery();
+  const userName = profileData?.data?.full_name || "User";
 
   return (
     <header className="bg-white">
@@ -32,7 +32,7 @@ const Header = (prop: HeaderProps) => {
             </a>
           </div>
           <a
-            href="/applicant/dashboard"
+            href="/applicant"
             className="py-2 border-b-2 border-blue-500 text-sm hover:text-[#6B7280] hidden md:inline-block"
           >
             Dashboard
@@ -49,7 +49,7 @@ const Header = (prop: HeaderProps) => {
               href="#"
               className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
             >
-              {prop.name || "John Doe"}
+              {userName}
             </a>
             <a
               href="#"
@@ -77,7 +77,7 @@ const Header = (prop: HeaderProps) => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="/applicant/dashboard"
+              href="/applicant"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
@@ -88,7 +88,7 @@ const Header = (prop: HeaderProps) => {
             >
               Your Profile
             </Link>
-            <span className="block text-gray-600 py-2">John Doe</span>
+            <span className="block text-gray-600 py-2"> {userName}</span>
             <button
               className="block text-gray-600 hover:text-gray-900 py-2"
               onClick={() => signOut({ callbackUrl: "/" })}

@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { useGetApplicationStatusQuery } from "../../../lib/redux/api/applicationApi";
-import ApplicationProgressPage from "../../components/ApplicationProgress";
-import ApplicantDashboard from "../../components/ApplicantDashboard";
+import { useGetApplicationStatusQuery } from "@/lib/redux/api/applicationApi";
+import ApplicationProgressPage from "../components/ApplicationProgress";
+import ApplicantDashboard from "../components/ApplicantDashboard";
 
 const Page = () => {
   const { data: application, isLoading } = useGetApplicationStatusQuery();

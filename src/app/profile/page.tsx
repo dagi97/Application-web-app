@@ -103,7 +103,7 @@ const Profile = () => {
       });
     }
   }, [profile, resetProfileForm]);
-  const dashlink = profile?.role ? `/${profile.role}/dashboard` : "/dashboard";
+  const dashlink = profile?.role ? `/${profile.role}` : "/unauthorized";
 
   const {
     register: registerPassword,
