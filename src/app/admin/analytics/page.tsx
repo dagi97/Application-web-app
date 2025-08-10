@@ -14,9 +14,8 @@ import {
   LabelList,
 } from "recharts";
 import NavBar from "@/app/components/navigation/AdminNav";
+import Footer from "@/app/components/Footer";
 import { useGetAnalyticsQuery } from "../../../lib/redux/api/adminApi";
-import AdminNav from "@/app/components/navigation/AdminNav";
-import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 
 type AnalyticsData = {
   total_applicants: number;
@@ -114,7 +113,7 @@ const AnalyticsDashboard = () => {
 
   return (
     <>
-      <AdminNav />
+      <NavBar />
       <div className="flex flex-col items-start p-6 md:p-10 gap-8 w-full max-w-[1920px] mx-auto bg-gray-50">
         {/* Header */}
         <div className="flex flex-col items-start gap-1 w-full max-w-[1280px]">
@@ -137,7 +136,6 @@ const AnalyticsDashboard = () => {
                 {formatNumber(analyticsData.total_applicants)}
               </p>
             </div>
-
 
             <div className="bg-white p-5 rounded-lg shadow-lg border-l-4 border-green-500">
               <p className="text-sm font-medium text-gray-500">
@@ -203,7 +201,6 @@ const AnalyticsDashboard = () => {
                 </ResponsiveContainer>
               </div>
             </div>
-
 
             {/* University Distribution */}
             <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -289,11 +286,7 @@ const AnalyticsDashboard = () => {
                     ]}
                   />
                   <Legend />
-<<<<<<< HEAD
-                  <Bar dataKey="value" name="Applicants" fill="#6C63FF" barSize={30} radius={[5, 5, 5, 5]}>
-                    <LabelList dataKey="value" position="right" formatter={(value) => formatNumber(value ?? 0)} />
-=======
-                  <Bar dataKey="value" name="Applicants" radius={[5, 5, 0, 0]}>
+                  <Bar dataKey="value" name="Applicants" radius={[5, 5, 0, 0]} barSize={30}>
                     {sortedMapData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill="url(#colorUv)" />
                     ))}
@@ -302,81 +295,14 @@ const AnalyticsDashboard = () => {
                       position="top"
                       formatter={(value: number) => formatNumber(value ?? 0)}
                     />
->>>>>>> 31cb1edf39aaf25f0f3f524bc2f6db1fab294d30
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
-<<<<<<< HEAD
-
-          {/* University Distribution */}
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex flex-col gap-1">
-              <h3 className="text-xl font-semibold text-gray-900">University Distribution</h3>
-              <p className="text-sm text-gray-500">Breakdown of applicants by university</p>
-            </div>
-            <div className="mt-3 h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={schoolData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={120}
-                    dataKey="value"
-                    nameKey="name"
-                    labelLine={false}
-                    label={({ name, value, percent }) =>
-                      `${name}: ${formatNumber(value)} (${(percent * 100).toFixed(1)}%)`
-                    }
-                  >
-                    {schoolData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name, props) => [`${formatNumber(Number(value))} (${props.payload.percent}%)`, props.payload.name]} />
-                  <Legend layout="horizontal" verticalAlign="bottom" align="center" />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Geographic Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow-lg w-full">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-xl font-semibold text-gray-900">Geographic Distribution</h3>
-            <p className="text-sm text-gray-500">Applicants by country</p>
-          </div>
-          <div className="mt-3 h-[500px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sortedMapData}>
-                <defs>
-                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.9} />
-                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0.3} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="country" />
-                <YAxis />
-                <Tooltip formatter={(value) => [formatNumber(Number(value)), 'Applicants']} />
-                <Legend />
-                <Bar dataKey="value" name="Applicants" radius={[5, 5, 0, 0]}>
-                  {sortedMapData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill="url(#colorUv)" />
-                  ))}
-                  <LabelList dataKey="value" position="top" formatter={(value) => formatNumber(value)} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-=======
->>>>>>> 31cb1edf39aaf25f0f3f524bc2f6db1fab294d30
         </div>
       </div>
-      <Footer_Variant1 />
+      <Footer />
     </>
   );
 };
