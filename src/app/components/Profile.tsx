@@ -11,7 +11,6 @@ import {
   updatePassword,
 } from "../../lib/redux/utils/login";
 import { useForm } from "react-hook-form";
-import Header from "./Header";
 import {
   Card,
   CardHeader,
@@ -257,9 +256,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <Header
-        name={isLoading ? "Loading..." : profile?.full_name || "User"}
-      ></Header>
       <main className="flex-1 mt-10">
         <div className="max-w-5xl mx-auto px-0 sm:px-6 lg:px-8">
           <div className="relative">

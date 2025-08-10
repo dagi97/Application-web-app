@@ -64,7 +64,7 @@ export const useAuth = () => {
 
     if (newSession?.user?.role) {
       const role = newSession.user.role;
-      if (role === "applicant") router.replace("/applicant/dashboard");
+      if (role === "applicant") router.replace("/applicant");
       else if (role === "manager") router.replace("/manager");
       else if (role === "reviewer") router.replace("/reviewer");
       else if (role === "admin") router.replace("/admin");
