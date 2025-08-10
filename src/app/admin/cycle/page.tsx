@@ -9,6 +9,7 @@ import {
   useDeleteCycleMutation 
 } from '../../../lib/redux/api/adminApi';
 
+
 type Cycle = {
   id: string;
   name: string;
@@ -84,66 +85,64 @@ const CycleCard = ({
   const country = countries[Math.floor(Math.random() * countries.length)];
 
   return (
-    <div className="relative w-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-      {deleteError && (
-        <div className="mb-2 p-2 text-sm text-red-600 bg-red-50 rounded">
-          {deleteError}
-        </div>
-      )}
-
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-xl font-semibold text-gray-900">
-          {cycle.name}
-        </h3>
-        <div className="flex space-x-2">
-          {cycle.is_active ? (
-            <button
-              className="px-3 py-1 text-sm text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50"
-              onClick={() => onDeactivate(cycle.id)}
-              disabled={isDeactivating}
+    <div>
+      <div className="relative w-full bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+        {deleteError && (
+          <div className="mb-2 p-2 text-sm text-red-600 bg-red-50 rounded">
+            {deleteError}
+          </div>
+        )}
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-xl font-semibold text-gray-900">
+            {cycle.name}
+          </h3>
+          <div className="flex space-x-2">
+            {cycle.is_active ? (
+              <button
+                className="px-3 py-1 text-sm text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50"
+                onClick={() => onDeactivate(cycle.id)}
+                disabled={isDeactivating}
+              >
+                {isDeactivating ? 'Deactivating...' : 'close'}
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                onClick={() => onActivate(cycle.id)}
+                disabled={isActivating}
+              >
+                {isActivating ? 'Activating...' : 'Activate'}
+              </button>
+            )}
+            <Link
+              className="px-3 py-1 text-sm text-white bg-orange-500 rounded-md hover:bg-orange-600"
+              href={`/admin/cycle/${cycle.id}`}
             >
-              {isDeactivating ? 'Deactivating...' : 'close'}
-            </button>
-          ) : (
+              Edit
+            </Link>
             <button
-              className="px-3 py-1 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
-              onClick={() => onActivate(cycle.id)}
-              disabled={isActivating}
+              className="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600 disabled:opacity-50"
+              onClick={() => onDelete(cycle.id)}
+              disabled={isDeleting}
             >
-              {isActivating ? 'Activating...' : 'Activate'}
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </button>
-          )}
-          <Link
-            className="px-3 py-1 text-sm text-white bg-orange-500 rounded-md hover:bg-orange-600"
-            href={`/admin/cycle/${cycle.id}`}
-          >
-            Edit
-          </Link>
-          <button
-            className="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600 disabled:opacity-50"
-            onClick={() => onDelete(cycle.id)}
-            disabled={isDeleting}
-          >
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </button>
+          </div>
         </div>
-      </div>
-
-      <p className="text-gray-600 mb-4">
-        {ordinal ? `The ${ordinal} generation of A2SVians` : cycle.name}
-      </p>
-
-      <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-        {/* Country replaces status */}
-        <div className="text-sm text-gray-500">
-          Country: <span className="font-semibold">{country}</span>
-        </div>
-
-        {/* Status replaces date */}
-        <div className="text-sm">
-          Status: <span className={cycle.is_active ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-            {cycle.is_active ? 'Active' : 'Closed'}
-          </span>
+        <p className="text-gray-600 mb-4">
+          {ordinal ? `The ${ordinal} generation of A2SVians` : cycle.name}
+        </p>
+        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+          {/* Country replaces status */}
+          <div className="text-sm text-gray-500">
+            Country: <span className="font-semibold">{country}</span>
+          </div>
+          {/* Status replaces date */}
+          <div className="text-sm">
+            Status: <span className={cycle.is_active ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+              {cycle.is_active ? 'Active' : 'Closed'}
+            </span>
+          </div>
         </div>
       </div>
     </div>
