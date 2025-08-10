@@ -2,9 +2,13 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-import { signIn, useSession, signOut } from "next-auth/react";
-import { useRegisterMutation, useForgotPasswordMutation, useResetPasswordMutation, setLogoutCallback } from "@/lib/redux/api/authApi";
+import { signIn, useSession, signOut, getSession } from "next-auth/react";
+import {
+  useRegisterMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  setLogoutCallback,
+} from "@/lib/redux/api/authApi";
 
 // Define types for login and registration data
 interface LoginData {
@@ -31,29 +35,35 @@ export const useAuth = () => {
   const [resetPasswordMutation] = useResetPasswordMutation();
 
   // Login function using next-auth's signIn with credentials provider
-  const login = async (data: { email: string; password: string; rememberMe?: boolean }) => {
+  const login = async (data: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }) => {
     const res = await signIn("credentials", {
       redirect: false, // handle redirect manually
       email: data.email,
       password: data.password,
-      rememberMe: data.rememberMe ? "true" : "false", // pass rememberMe flag as string
+      rememberMe: data.rememberMe ? "true" : "false",
     });
 
     if (res?.error) {
-      alert(res.error); // show error if login failed
+      alert(res.error);
       return;
     }
 
-    // Save rememberMe preference in localStorage (persistent) or remove it
+    // Save rememberMe preference
     if (data.rememberMe) {
       localStorage.setItem("rememberMe", "true");
     } else {
       localStorage.removeItem("rememberMe");
     }
 
-    // Redirect user to role-based dashboard or default redirect URL
-    if (session?.user?.role) {
-      const role = session.user.role;
+    // ✅ Fetch the *fresh* session after successful login
+    const newSession = await getSession();
+
+    if (newSession?.user?.role) {
+      const role = newSession.user.role;
       if (role === "applicant") router.replace("/applicant");
       else if (role === "manager") router.replace("/manager");
       else if (role === "reviewer") router.replace("/reviewer");
@@ -85,7 +95,10 @@ export const useAuth = () => {
   const forgotPassword = async (email: string) => {
     try {
       const callbackUrl = `${window.location.origin}/auth/reset-password`;
-      await forgotPasswordMutation({ email, callback_url: callbackUrl }).unwrap();
+      await forgotPasswordMutation({
+        email,
+        callback_url: callbackUrl,
+      }).unwrap();
       alert("If the email exists, a password reset link has been sent.");
     } catch (err: any) {
       alert(err?.data?.message || "Failed to send reset link");
@@ -95,10 +108,16 @@ export const useAuth = () => {
   // Reset password using token and new password
   const resetPassword = async (token: string, newPassword: string) => {
     try {
-      await resetPasswordMutation({ token, new_password: newPassword }).unwrap();
+      await resetPasswordMutation({
+        token,
+        new_password: newPassword,
+      }).unwrap();
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err?.data?.message || "Failed to reset password" };
+      return {
+        success: false,
+        error: err?.data?.message || "Failed to reset password",
+      };
     }
   };
 

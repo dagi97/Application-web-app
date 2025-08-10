@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { FC, useState, useEffect } from "react";
 import { fetchReviewDetails } from "../../lib/redux/utils/login";
@@ -31,6 +32,7 @@ const ApplicationCard: FC<Props> = ({
   const { applicant_name, status, submission_date, application_id } =
     application;
   const router = useRouter();
+  const { data: session } = useSession();
 
   let formattedDate = "";
   if (submission_date) {
@@ -54,11 +56,9 @@ const ApplicationCard: FC<Props> = ({
   useEffect(() => {
     let ignore = false;
     const getDetails = async () => {
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("access_token") || undefined
-          : undefined;
-      const details = await fetchReviewDetails(application_id, token);
+      // Use access token from NextAuth session
+      const accessToken = (session as any)?.access;
+      const details = await fetchReviewDetails(application_id, accessToken);
       if (!ignore) {
         setReviewDetails(details);
         if (status !== "accepted" && status !== "rejected") {
@@ -74,17 +74,10 @@ const ApplicationCard: FC<Props> = ({
     return () => {
       ignore = true;
     };
-  }, [application_id, status]);
+  }, [application_id, status, session]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-5 flex flex-col justify-between hover:shadow-lg transition-shadow duration-300">
-      {/* Debug log for reviewDetails - remove later
-      <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-900">
-        <strong>Debug reviewDetails:</strong>
-        <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-          {JSON.stringify(reviewDetails, null, 2)}
-        </pre>
-      </div> */}
       <div>
         <div className="flex items-start gap-4 mb-4">
           <Image
@@ -117,7 +110,7 @@ const ApplicationCard: FC<Props> = ({
                 );
               }
               router.push(
-                `/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
+                `reviewer/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName
                 )}&readonly=true&status=${status}`
               );
@@ -144,7 +137,7 @@ const ApplicationCard: FC<Props> = ({
                 }
               ).catch(() => {});
               router.push(
-                `/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
+                `reviewer/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName
                 )}`
               );

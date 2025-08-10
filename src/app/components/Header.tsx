@@ -1,10 +1,13 @@
+"use client";
 import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 interface HeaderProps {
   name: string;
+  dashboardLink: string;
 }
 
 const Header = (prop: HeaderProps) => {
@@ -21,17 +24,11 @@ const Header = (prop: HeaderProps) => {
               rel="noopener noreferrer"
               className="cursor-pointer"
             >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
+              <img src={"/a2sv-logo.svg"} />
             </Link>
           </div>
           <Link
-            href="#"
+            href={prop.dashboardLink}
             className="py-2 border-b-2 border-blue-500 text-sm hover:text-[#6B7280] hidden md:inline-block"
           >
             Dashboard
@@ -53,6 +50,7 @@ const Header = (prop: HeaderProps) => {
             <Link
               href="#"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:underline hover:text-[#829FAB]"
+              onClick={() => signOut({ callbackUrl: "/" })}
             >
               Logout
             </Link>
@@ -75,7 +73,7 @@ const Header = (prop: HeaderProps) => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="#" // Fix when you want to link to the dashboard
+              href={prop.dashboardLink}
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
@@ -87,7 +85,10 @@ const Header = (prop: HeaderProps) => {
               Your Profile
             </Link>
             <span className="block text-gray-600 py-2">John Doe</span>
-            <button className="block text-gray-600 hover:text-gray-900 py-2">
+            <button
+              className="block text-gray-600 hover:text-gray-900 py-2"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
               Logout
             </button>
           </div>

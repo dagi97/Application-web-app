@@ -1,22 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { useGetAssignedReviewsQuery } from "../../../lib/redux/api/reviewsApiSlice";
+import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice";
 import { useState, useEffect } from "react";
-import ApplicationCard from "../../components/ApplicationCard";
-import Header from "../../components/Header";
+import { useSession } from "next-auth/react";
+import ApplicationCard from "../components/ApplicationCard";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
+import Header from "../components/Header";
 import {
   fetchReviewerProfile,
-  loginAndStoreToken,
   fetchReviewDetails,
-} from "../../../lib/redux/utils/login";
+} from "../../lib/redux/utils/login";
 
 export default function ReviewerDashboard() {
+  const { data: session } = useSession();
+  const { data: profileData } = useGetProfileQuery();
   const [leftHovered, setLeftHovered] = useState(false);
   const [rightHovered, setRightHovered] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "underReview" | "complete"
   >("all");
+  const [sortBy, setSortBy] = useState("date");
+  const reviewerName = profileData?.data.full_name || "Reviewer";
 
   useEffect(() => {
     setCurrentPage(1);
@@ -24,27 +29,15 @@ export default function ReviewerDashboard() {
       setApplications(data.data.reviews);
     }
   }, [selectedFilter]);
-  const [sortBy, setSortBy] = useState("date");
-  const [reviewerName, setReviewerName] = useState("Reviewer");
-
-  // This is a temporary solution for testing purposes (login), change when mixed with others
   useEffect(() => {
-    loginAndStoreToken("abcd@gmail.com", "bezzthegoat!AA").catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
-    if (token) {
-      fetchReviewerProfile(token).then((profile) => {
+    const accessToken = (session as any)?.access;
+    if (accessToken) {
+      fetchReviewerProfile(accessToken).then((profile) => {
         if (profile) {
-          setReviewerName(profile.full_name || "Reviewer");
         }
       });
     }
-  }, []);
+  }, [session]);
 
   const { data, isLoading, isError } = useGetAssignedReviewsQuery({
     page: 1,
@@ -63,23 +56,23 @@ export default function ReviewerDashboard() {
   }, [data]);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
+    const accessToken = (session as any)?.access;
     async function fetchAllReviewDetails() {
-      if (!token || applications.length === 0) return;
+      if (!accessToken || applications.length === 0) return;
       const detailsMap: Record<string, any> = {};
       await Promise.all(
         applications.map(async (app) => {
-          const detail = await fetchReviewDetails(app.application_id, token);
+          const detail = await fetchReviewDetails(
+            app.application_id,
+            accessToken
+          );
           detailsMap[app.application_id] = detail;
         })
       );
       setReviewDetailsMap(detailsMap);
     }
     fetchAllReviewDetails();
-  }, [applications]);
+  }, [applications, session]);
 
   // Temp solution until i figure out how to change the status on the backend, this is just for local state management
   const handleStatusChange = (applicationId: string, newStatus: string) => {
@@ -130,7 +123,7 @@ export default function ReviewerDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <Header name={reviewerName} />
+      <Header name={reviewerName} dashboardLink="/reviewer" />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-12 mb-24">
@@ -288,11 +281,10 @@ export default function ReviewerDashboard() {
         </div>
       </main>
 
-      <footer className="bg-[#1F2937] mt-12 sticky bottom-0 w-full">
-        <div className="max-w-7xl mx-auto pb-10 pt-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-          <hr className="text-gray-600 w-full mb-3" />
-          <p className="text-sm text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} A2SV. All rights reserved.
+      <footer className="bg-gray-800 text-white py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-400">
+            © {new Date().getFullYear()} A2SV. All rights reserved.
           </p>
         </div>
       </footer>

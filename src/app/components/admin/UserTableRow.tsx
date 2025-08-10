@@ -38,13 +38,15 @@ const UserTableRow = ( {user} :{user: User}) => {
     }
   };
 
+  const imgUrl: string = user?.profile_picture || '/profile.png'; 
+
   
 
   return (
     <tr>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className='md: flex items-center gap-3'>
-          <Image src={user.profile_picture}  alt="User Profile" width={35} height={35} />
+          <Image src={imgUrl}  alt="User Profile" width={35} height={35} />
           <div>
             <p className='font-bold'>{user.full_name}</p>
             <p className='text-[#6B7280]'>{user.email}</p>

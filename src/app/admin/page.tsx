@@ -6,11 +6,18 @@ import SummaryCard from "../components/admin/SummaryCard";
 import ActionCard from "../components/admin/ActionCard";
 import ActivityCard from "../components/admin/ActivityCard";
 import Footer_Variant1 from "../components/footer/footer_variant1";
-import { useGetPaginatedUsersQuery } from "@/lib/redux/api/adminApi";
+import { useGetPaginatedUsersQuery,useGetActiveCyclesQuery,useGetAnalyticsQuery } from "@/lib/redux/api/adminApi";
 
 const Page = () => {
-  const {data} = useGetPaginatedUsersQuery({page:1,limit:5})
-  const tot_user = data?.total_count
+  const {data: getUsers} = useGetPaginatedUsersQuery({page:1,limit:5})
+  const tot_user = getUsers?.total_count
+
+  const {data: getActiveCycles} = useGetActiveCyclesQuery({page:1,limit:5})
+  const active_cycles = getActiveCycles?.data.total_count || 0;
+
+  const {data: getAnalytics} = useGetAnalyticsQuery()
+  const total_applicants = getAnalytics?.total_applicants || 0;
+
 
 
   return (
@@ -28,10 +35,10 @@ const Page = () => {
               <SummaryCard title="Total Users" number={tot_user} />
             </div>
             <div className="bg-gradient-to-br from-[#22C55E] to-[#0D9488] pt-3 pb-3 pl-4 rounded-md">
-              <SummaryCard title="Total Applicants" number={1204} />
+              <SummaryCard title="Total Applicants" number={total_applicants}/>
             </div>
             <div className="bg-gradient-to-br from-[#EAB308] to-[#EA580C] pt-3 pb-3 pl-4 rounded">
-              <SummaryCard title="Active Cycles" number={1} />
+              <SummaryCard title="Active Cycles" number={active_cycles} />
             </div>
         
             <div className="pb-32 flex-1 shadow-2xl rounded-md pt-5 pl-5 bg-white">

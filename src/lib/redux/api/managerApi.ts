@@ -4,6 +4,7 @@ import {
   mapApiToReviewDetail,
   ReviewDetail,
 } from "@/lib/redux/types/applicantData";
+import { getSession } from "next-auth/react";
 
 // --- Interfaces ---
 export interface ApplicantDetails {
@@ -52,14 +53,14 @@ export const managerApi = createApi({
   reducerPath: "managerApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://a2sv-application-platform-backend-team2.onrender.com/",
-    prepareHeaders: (headers) => {
-      if (typeof window !== "undefined") {
-        const token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5ZTFlODJiNS1mYWRmLTRiOTEtOGUzNi04N2ViNmViMzE0NWQiLCJleHAiOjE3NTQ3NDQ3ODUsInR5cGUiOiJhY2Nlc3MifQ.Z3gWOGcFlEg4viBsbfK0vwHZ6yhIm3f9lgPbYFA49gg";
-        if (token) {
-          headers.set("Authorization", `Bearer ${token}`);
-        }
+    prepareHeaders: async (headers) => {
+      // ✅ Get the NextAuth session
+      const session = await getSession();
+
+      if (session?.access) {
+        headers.set("Authorization", `Bearer ${session.access}`);
       }
+
       return headers;
     },
   }),

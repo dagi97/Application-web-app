@@ -1,8 +1,11 @@
-"use client;";
+"use client";
+
 import React from "react";
 import Button from "./Button";
+import { useRouter } from "next/navigation";
 
 export default function NotFoundPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen flex flex-col">
       {/* 404 Section */}
@@ -16,7 +19,7 @@ export default function NotFoundPage() {
           <Button
             size="small"
             className="mt-6"
-            onClick={() => (window.location.href = "/")}
+            onClick={() => router.push("/")}
           >
             Go Home
           </Button>

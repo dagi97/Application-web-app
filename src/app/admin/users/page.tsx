@@ -12,6 +12,7 @@ import Pagination from "@/app/components/admin/Pagination";
 import { useGetPaginatedUsersQuery, useGetAllUsersForSearchQuery } from "@/lib/redux/api/adminApi";
 import { RootState } from "@/lib/redux/utils/store";
 import { setSearchText, setRole, setCurrentPage } from "@/lib/redux/slices/admin/filterSlice";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -101,7 +102,7 @@ const Page = () => {
 
   const renderContent = () => {
     if (isLoading) {
-      return <div className="text-center p-8">Loading users...</div>;
+      return <LoadingSpinner/>;
     }
 
     if (isApiError) {
