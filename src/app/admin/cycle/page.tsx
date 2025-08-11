@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -150,11 +151,28 @@ const CycleCard = ({
   );
 };
 
+const SearchBar = ({ searchText, handleSearchChange }: { searchText: string; handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => {
+  return (
+    <div className='bg-white p-4 rounded-md shadow-md'>
+      <form className='flex flex-col gap-3 md:flex-row md:justify-between md:items-center'>
+        <input 
+          type="text" 
+          placeholder='Search cycles by name...' 
+          value={searchText} 
+          onChange={handleSearchChange} 
+          className='bg-gray-100 w-full text-gray-700 font-normal p-2 rounded-md md:mr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+        />
+      </form>
+    </div>
+  );
+};
+
 export default function PaginatedCycles() {
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 4 });
   const [currentDeletingId, setCurrentDeletingId] = useState<string | null>(null);
   const [currentActingId, setCurrentActingId] = useState<string | null>(null);
   const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [searchText, setSearchText] = useState('');
 
   const router = useRouter();
   
@@ -224,11 +242,30 @@ export default function PaginatedCycles() {
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+    setPagination({ page: 1, limit: pagination.limit }); // reset page on new search
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (fetchError) return <ErrorDisplay error={fetchError} />;
 
   const { cycles = [], total_count = 0 } = cyclesData?.data || {};
-  const totalPages = Math.ceil(total_count / pagination.limit);
+
+  // Filter cycles locally by name (case insensitive)
+  const filteredCycles = cycles.filter(cycle => 
+    cycle.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Adjust total count for filtered results
+  const totalFiltered = filteredCycles.length;
+  const totalPages = Math.ceil(totalFiltered / pagination.limit);
+
+  // Paginate filtered results
+  const paginatedCycles = filteredCycles.slice(
+    (pagination.page - 1) * pagination.limit,
+    pagination.page * pagination.limit
+  );
 
   const handlePageChange = (page: number) => {
     setPagination(prev => ({ ...prev, page }));
@@ -237,6 +274,15 @@ export default function PaginatedCycles() {
   return (
     <div className="flex flex-col min-h-screen">
       <AdminNav />
+
+      {/* Space between navbar and search bar container */}
+      <div className="w-full max-w-7xl mx-auto px-4 mb-6">
+        <SearchBar 
+          searchText={searchText} 
+          handleSearchChange={handleSearchChange} 
+        />
+      </div>
+
       {alert && (alert.type === 'success' 
         ? <SuccessAlert message={alert.message} /> 
         : <ErrorAlert message={alert.message} />
@@ -257,7 +303,7 @@ export default function PaginatedCycles() {
 
         <div className="flex flex-col items-center w-full py-10 gap-10">
           <div className="flex flex-col items-start w-full gap-8">
-            {cycles.length === 0 ? (
+            {paginatedCycles.length === 0 ? (
               <div className="w-full text-center py-10">
                 <p className="text-gray-500">No cycles found</p>
                 <Link 
@@ -270,7 +316,7 @@ export default function PaginatedCycles() {
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                  {cycles.map((cycle) => (
+                  {paginatedCycles.map((cycle) => (
                     <CycleCard
                       key={cycle.id}
                       cycle={cycle}
@@ -285,63 +331,61 @@ export default function PaginatedCycles() {
                   ))}
                 </div>
 
-              
-                  <div className="w-full mt-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
-                      <p className="text-sm text-gray-700">
-                        Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, total_count)} of {total_count} results
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handlePageChange(pagination.page - 1)}
-                          disabled={pagination.page === 1}
-                          className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-l-md disabled:opacity-50 hover:bg-gray-50"
-                        >
-                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.5 15L7.5 10L12.5 5" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
+                <div className="w-full mt-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+                    <p className="text-sm text-gray-700">
+                      Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, totalFiltered)} of {totalFiltered} results
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handlePageChange(pagination.page - 1)}
+                        disabled={pagination.page === 1}
+                        className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-l-md disabled:opacity-50 hover:bg-gray-50"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12.5 15L7.5 10L12.5 5" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
 
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 5) {
-                            pageNum = i + 1;
-                          } else if (pagination.page <= 3) {
-                            pageNum = i + 1;
-                          } else if (pagination.page >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                          } else {
-                            pageNum = pagination.page - 2 + i;
-                          }
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (pagination.page <= 3) {
+                          pageNum = i + 1;
+                        } else if (pagination.page >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = pagination.page - 2 + i;
+                        }
 
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`px-3 py-1 h-10 font-medium text-sm ${
-                                pagination.page === pageNum
-                                  ? 'bg-indigo-50 border border-indigo-500 text-indigo-600'
-                                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`px-3 py-1 h-10 font-medium text-sm ${
+                              pagination.page === pageNum
+                                ? 'bg-indigo-50 border border-indigo-500 text-indigo-600'
+                                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
 
-                        <button
-                          onClick={() => handlePageChange(pagination.page + 1)}
-                          disabled={pagination.page === totalPages}
-                          className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-r-md disabled:opacity-50 hover:bg-gray-50"
-                        >
-                          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.5 15L12.5 10L7.5 5" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handlePageChange(pagination.page + 1)}
+                        disabled={pagination.page === totalPages}
+                        className="p-2 w-10 h-10 bg-white border border-gray-300 rounded-r-md disabled:opacity-50 hover:bg-gray-50"
+                      >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7.5 15L12.5 10L7.5 5" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
                     </div>
                   </div>
-                
+                </div>
               </>
             )}
           </div>
