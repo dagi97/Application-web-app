@@ -1,5 +1,4 @@
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import HeaderReviewDetail from "../../components/HeaderReviewDetail";
@@ -143,35 +142,9 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
         onLeftHoverChange={onLeftHoverChange}
       />
 
-      <div className="bg-[#1F2937] max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center min-w-screen">
-        <p className="text-sm text-white">
-          &copy; 2025 A2SV. All rights reserved.
-        </p>
-      </div>
-
       <main className="py-8">
         <div className="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
           <header className="mb-8">
-            <a
-              href="/"
-              className="flex"
-              onMouseEnter={() => onLeftHoverChange && onLeftHoverChange(true)}
-              onMouseLeave={() => onLeftHoverChange && onLeftHoverChange(false)}
-            >
-              <Image
-                src={
-                  leftHovered
-                    ? "/images/variant=1.png"
-                    : "/images/variant=2.png"
-                }
-                alt="left"
-                width={20}
-                height={20}
-              />
-              <p className="text-sm text-[#6B7280] hover:text-gray-700">
-                Back to Dashboard
-              </p>
-            </a>
             <h1 className="text-3xl font-extrabold mt-2">
               Review: {reviewDetail ? reviewDetail.name : "Undefined"}
             </h1>
@@ -444,6 +417,11 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
           </div>
         </div>
       </main>
+      <div className="bg-[#1F2937] max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center min-w-screen">
+        <p className="text-sm text-white">
+          &copy; 2025 A2SV. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 };

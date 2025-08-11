@@ -5,24 +5,24 @@ import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice"
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ApplicationCard from "../components/ApplicationCard";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 import Header from "../components/Header";
 import {
   fetchReviewerProfile,
   fetchReviewDetails,
 } from "../../lib/redux/utils/login";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function ReviewerDashboard() {
   const { data: session } = useSession();
+  const { data: profileData } = useGetProfileQuery();
   const [leftHovered, setLeftHovered] = useState(false);
   const [rightHovered, setRightHovered] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "underReview" | "complete"
   >("all");
   const [sortBy, setSortBy] = useState("date");
-  const reviewerName =
-    (session?.user && "name" in session.user
-      ? (session.user as { name?: string }).name
-      : undefined) || "Reviewer";
+  const reviewerName = profileData?.data.full_name || "Reviewer";
 
   useEffect(() => {
     setCurrentPage(1);
@@ -131,7 +131,7 @@ export default function ReviewerDashboard() {
           <div className="mb-8">
             <h1 className="text-3xl font-extrabold">Assigned Applications</h1>
             {isLoading ? (
-              <p className="mt-2 text-gray-600">Loading applications...</p>
+              <LoadingSpinner />
             ) : isError ? (
               <p className="mt-2 text-red-600">Failed to load applications.</p>
             ) : (
@@ -193,9 +193,7 @@ export default function ReviewerDashboard() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {isLoading ? (
-              <div className="col-span-3 text-center text-gray-500">
-                Loading...
-              </div>
+              <LoadingSpinner />
             ) : isError ? (
               <div className="col-span-3 text-center text-red-500">
                 Error loading applications.
