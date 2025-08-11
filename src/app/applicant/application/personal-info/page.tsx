@@ -7,6 +7,7 @@ import { Progress } from "@/app/components/Progress";
 import { Label } from "@/app/components/Label";
 import { useApplicationForm } from "@/lib/context/ApplicationFormContext";
 import Header from "@/app/components/ApplicantHeader";
+import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 
 export default function PersonalInfoStep() {
   const router = useRouter();
@@ -135,6 +136,7 @@ export default function PersonalInfoStep() {
           </div>
         </form>
       </div>
+      <Footer_Variant1 />
     </>
   );
 }
