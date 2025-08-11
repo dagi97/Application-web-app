@@ -24,8 +24,8 @@ const SignIn = () => {
     watch,
     formState: { errors },
   } = useForm<FormData>();
+  const { login, loading, loginError } = useAuth();
   const hasError = errors.password || errors.email;
-  const { login, loading } = useAuth();
   return (
     <div className="bg-[#F9FAFB]">
       <HeaderAuth text="Create Account" />
@@ -50,6 +50,7 @@ const SignIn = () => {
           }
         />
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+          <p className="text-red-500 text-sm mt-2">{loginError}</p>
           <div className="w-full border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
             <div className="w-full flex flex-col gap-1">
               <InputField
