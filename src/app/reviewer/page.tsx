@@ -11,6 +11,7 @@ import {
   fetchReviewerProfile,
   fetchReviewDetails,
 } from "../../lib/redux/utils/login";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function ReviewerDashboard() {
   const { data: session } = useSession();
@@ -130,7 +131,7 @@ export default function ReviewerDashboard() {
           <div className="mb-8">
             <h1 className="text-3xl font-extrabold">Assigned Applications</h1>
             {isLoading ? (
-              <p className="mt-2 text-gray-600">Loading applications...</p>
+              <LoadingSpinner />
             ) : isError ? (
               <p className="mt-2 text-red-600">Failed to load applications.</p>
             ) : (
@@ -189,9 +190,7 @@ export default function ReviewerDashboard() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {isLoading ? (
-              <div className="col-span-3 text-center text-gray-500">
-                Loading...
-              </div>
+              <LoadingSpinner />
             ) : isError ? (
               <div className="col-span-3 text-center text-red-500">
                 Error loading applications.
