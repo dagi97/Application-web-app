@@ -7,7 +7,7 @@ const TestimonyCard = ({ testimony, name, title, company, image }: any) => {
         
         text-[#4B5563]
 shadow-[0_2px_30px_rgb(0,0,0,0.12)]        px-10
-        py-8
+        py-8 h-[300px] w-[400px] flex-col
 
 
         '>
