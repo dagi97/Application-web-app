@@ -133,7 +133,7 @@ export default function PersonalInfoStep() {
               variant="secondary"
               size="small"
               className="bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-md"
-              onClick={() => router.push("/applicant/dashboard")}
+              onClick={() => router.push("/applicant")}
             >
               Back
             </Button>

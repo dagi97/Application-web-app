@@ -17,7 +17,7 @@ export default function PersonalInfoStep() {
     router.push("/applicant/application/coding-profiles");
   };
   const handleBack = () => {
-    router.push("/");
+    router.push("/applicant");
   };
 
   return (
