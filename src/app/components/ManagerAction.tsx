@@ -159,6 +159,9 @@ const ManagerAction: React.FC<ManagerActionProps> = ({ applicationId }) => {
 
       showToaster(`Application ${status} successfully!`, "success");
       setDecisionNote("");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err) {
       showToaster(
         `Failed to ${status} application. Please try again.`,
