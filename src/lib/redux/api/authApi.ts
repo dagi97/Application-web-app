@@ -1,98 +1,77 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { BaseQueryFn, FetchArgs, FetchBaseQueryMeta } from '@reduxjs/toolkit/query';
+import { createApi, fetchBaseQuery, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { getSession } from 'next-auth/react';
 
-// Base URL for backend API
 const BASE_URL = 'https://a2sv-application-platform-backend-team2.onrender.com';
 
-// Helpers to get and store tokens either in localStorage (persistent) or sessionStorage (temporary)
-const getStoredToken = () => {
-  const access = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-  const refresh = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
-  return { access, refresh };
-};
-
-const storeTokens = (access: string, refresh: string) => {
-  // If refresh token exists in localStorage, store both tokens there (rememberMe)
-  if (localStorage.getItem('refresh_token')) {
-    localStorage.setItem('access_token', access);
-    localStorage.setItem('refresh_token', refresh);
-  } else {
-    // Otherwise store in sessionStorage (session only)
-    sessionStorage.setItem('access_token', access);
-    sessionStorage.setItem('refresh_token', refresh);
-  }
-};
-
-// To store a logout callback from your React hook for forced logout on token failure
 let logoutCallback: (() => void) | null = null;
 export const setLogoutCallback = (callback: () => void) => {
   logoutCallback = callback;
 };
 
-// Basic baseQuery adds Authorization header with access token
-const baseQuery = fetchBaseQuery({
+const rawBaseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
-  prepareHeaders: (headers) => {
-    const { access } = getStoredToken();
-    if (access) {
-      headers.set('Authorization', `Bearer ${access}`);
+  prepareHeaders: async (headers) => {
+    const session = await getSession();
+    const accessToken = (session as any)?.access;
+    if (accessToken) {
+      headers.set("Authorization", `Bearer ${accessToken}`);
     }
-    headers.set('Content-Type', 'application/json');
+    headers.set("Content-Type", "application/json");
     return headers;
   },
 });
 
-// Extended baseQuery to handle 401 errors by trying to refresh tokens
-const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, unknown, {}, FetchBaseQueryMeta> = async (
-  args,
-  api,
-  extraOptions
-) => {
-  let result = await baseQuery(args, api, extraOptions);
+// Wrapper to handle refresh token logic
+const baseQueryWithReauth: typeof rawBaseQuery = async (args, api, extraOptions) => {
+  let result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) {
-    const { refresh } = getStoredToken();
+  if (result.error && (result.error as FetchBaseQueryError).status === 401) {
+    console.warn("Access token expired, attempting refresh...");
 
-    if (refresh) {
-      // Prevent infinite retry loops
-      if (!(api.getState() as any).auth?._retry) {
-        try {
-          const refreshResult = await baseQuery(
-            {
-              url: '/auth/token/refresh/',
-              method: 'POST',
-              body: { refresh },
-            },
-            api,
-            extraOptions
-          );
+    const session = await getSession();
+    if (!session?.error && session?.user) {
+      try {
+        // Call refresh endpoint
+        const refreshRes = await fetch(`${BASE_URL}/auth/token/refresh/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: (session as any)?.refresh }),
+        });
 
-          if (refreshResult.data) {
-            const { access } = refreshResult.data as { access: string };
-            storeTokens(access, refresh);
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          const newAccessToken = refreshData?.data?.access;
 
-            // Retry original query with new access token
-            result = await baseQuery(args, api, extraOptions);
-          } else {
-            throw new Error('No refresh token data');
+          if (newAccessToken) {
+            // Update the session in memory
+            (session as any).access = newAccessToken;
+
+            // Retry the original request with new token
+            if (typeof args !== 'string') {
+              args.headers = {
+                ...(args.headers || {}),
+                Authorization: `Bearer ${newAccessToken}`,
+              };
+            }
+            result = await rawBaseQuery(args, api, extraOptions);
           }
-        } catch {
-          // If refresh fails, call logout callback or redirect to login page
+        } else {
+          console.error("Refresh token failed, logging out");
           if (logoutCallback) logoutCallback();
-          else window.location.href = '/auth/signin';
         }
+      } catch (err) {
+        console.error("Refresh request failed:", err);
+        if (logoutCallback) logoutCallback();
       }
     } else {
-      // No refresh token — logout immediately
+      console.error("No session available for token refresh");
       if (logoutCallback) logoutCallback();
-      else window.location.href = '/auth/signin';
     }
   }
 
   return result;
 };
 
-// Define API endpoints for auth related operations
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: baseQueryWithReauth,
@@ -121,7 +100,6 @@ export const authApi = createApi({
   }),
 });
 
-// Export hooks for components to use
 export const {
   useRegisterMutation,
   useForgotPasswordMutation,

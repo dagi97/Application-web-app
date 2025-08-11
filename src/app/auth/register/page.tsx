@@ -1,89 +1,119 @@
-"use client"
-import React, { useState } from "react";
+"use client";
+
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/hooks/useAuth";
-import ActionSuccess from "@/app/components/ActionSuccess";  // import your success component
-import HeaderForIndex from "@/app/components/HeaderForIndex";
-import Footer from "@/app/components/Footer";
 import AuthHeader from "@/app/components/AuthHeader";
 import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import Footer from "@/app/components/Footer";
+import HeaderAuth from "@/app/components/HeaderAuth";
 
 type FormData = {
+  name: string;
+  email: string;
   password: string;
   confirmPassword: string;
 };
 
-export default function ResetPassword() {
-  const { resetPassword } = useAuth();
-  const [success, setSuccess] = useState(false);
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") || "";
-
+const Register = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = async (data: FormData) => {
+  const { register: registerUser, loading } = useAuth();
+
+  const onSubmit = (data: FormData) => {
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match.");
+      alert("Passwords don't match");
       return;
     }
-    const result = await resetPassword(token, data.password);
-    if (result.success) {
-      setSuccess(true);
-    } else {
-      alert(result.error);
-    }
+
+    registerUser({
+      full_name: data.name,
+      email: data.email,
+      password: data.password,
+    });
   };
 
-  if (success) {
-    return <ActionSuccess />;
-  }
-
   return (
-    <div className="bg-[#F3F4F6]">
-      <HeaderForIndex />
+    <div className="bg-[#F9FAFB]">
+      <HeaderAuth text="Sign in"/>
       <AuthLayout>
         <AuthHeader
-          title="Set a new password"
-          subtitle="Please choose a strong, new password for your account."
+          title="Create a new applicant account"
+          subtitle={
+            <>
+              Or{" "}
+              <Link
+                href="/auth/signin"
+                className="text-[#4F46E5] hover:underline"
+              >
+                sign in to your existing account
+              </Link>
+            </>
+          }
         />
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
-          <div className="border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
-            <div className="flex flex-col gap-1">
-              <InputField
-                isLast={false}
-                type="password"
-                placeholder="New Password"
-                {...register("password", { required: "Password is required" })}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs">{errors.password.message}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <InputField
-                isLast={true}
-                type="password"
-                placeholder="Confirm New Password"
-                {...register("confirmPassword", { required: "Please confirm password" })}
-              />
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-xs">{errors.confirmPassword.message}</p>
-              )}
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+          <div className="w-full border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
+            <InputField
+              isLast={false}
+              type="text"
+              placeholder="Full Name"
+              {...register("name", { required: "Full name is required" })}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-xs">{errors.name.message}</p>
+            )}
+            <InputField
+              isLast={false}
+              type="email"
+              placeholder="Email address"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email format",
+                },
+              })}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs">{errors.email.message}</p>
+            )}
+            <InputField
+              isLast={false}
+              type="password"
+              placeholder="Password"
+              {...register("password", { required: "Password is required" })}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs">{errors.password.message}</p>
+            )}
+            <InputField
+              isLast={true}
+              type="password"
+              placeholder="Confirm password"
+              {...register("confirmPassword", {
+                required: "Confirm Password is required",
+              })}
+            />
           </div>
-          <div className="w-full mt-6">
-            <Button text="Update Password" />
-          </div>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-xs">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+          <div className="w-full h-6" />
+          <Button text="Create account" />
         </form>
       </AuthLayout>
-      <Footer />
+      <Footer/>
     </div>
   );
-}
+};
+
+export default Register;

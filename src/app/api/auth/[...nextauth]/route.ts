@@ -1,29 +1,35 @@
-// NextAuth configuration and token refresh logic
-import NextAuth, { AuthOptions, User, Account, Profile } from "next-auth";
+// next-auth handler (e.g., app/api/auth/[...nextauth]/route.ts or route.js)
+
+import NextAuth, { AuthOptions, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-// Extend User and JWT types to include tokens, role, rememberMe flag
-export interface MyUser extends User {
+interface MyUser extends User {
   access: string;
   refresh: string;
   role: string;
-  rememberMe?: boolean;
 }
 
 interface MyToken extends JWT {
   access?: string;
   refresh?: string;
   role?: string;
-  email?: string; // user email
-  rememberMe?: boolean;
-  accessTokenExpires?: number; // timestamp when access token expires
+  email?: string;
   error?: string | null;
 }
 
-// Function to refresh access token using refresh token
 async function refreshAccessToken(token: MyToken): Promise<MyToken> {
+  console.log("Refreshing token with refresh:", token.refresh);
+  if (!token.refresh) {
+    console.error("No refresh token available!");
+    return {
+      ...token,
+      access: undefined,
+      refresh: undefined,
+      error: "RefreshAccessTokenError",
+    };
+  }
+
   try {
     const res = await fetch(
       "https://a2sv-application-platform-backend-team2.onrender.com/auth/token/refresh/",
@@ -37,36 +43,33 @@ async function refreshAccessToken(token: MyToken): Promise<MyToken> {
     const data = await res.json();
 
     if (!res.ok) {
-      throw data; // Refresh failed, will be caught below
+      throw data;
     }
 
     return {
       ...token,
-      access: data.access,
-      accessTokenExpires: Date.now() + 15 * 60 * 1000, // new expiry 15 mins from now
-      refresh: data.refresh ?? token.refresh, // update refresh token if new one provided
+      access: data.data.access,
       error: null,
     };
   } catch (error) {
     console.error("Refresh token error", error);
     return {
       ...token,
-      error: "RefreshAccessTokenError", // flag error to handle logout
+      access: undefined,
+      refresh: undefined,
+      error: "RefreshAccessTokenError",
     };
   }
 }
 
 export const authOptions: AuthOptions = {
-  // Use CredentialsProvider to authenticate with email/password
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
-        rememberMe: { label: "Remember Me", type: "boolean" }, // optional remember me checkbox
       },
-      // Called when user submits login form
       async authorize(credentials) {
         const res = await fetch(
           "https://a2sv-application-platform-backend-team2.onrender.com/auth/token/",
@@ -82,7 +85,6 @@ export const authOptions: AuthOptions = {
 
         const data = await res.json();
 
-        // If login successful, return user object with tokens, role, and name
         if (res.ok && data?.data?.access) {
           return {
             id: credentials?.email || "",
@@ -91,77 +93,60 @@ export const authOptions: AuthOptions = {
             refresh: data.data.refresh,
             role: data.data.role,
             name: data.data.full_name || undefined,
-            rememberMe: credentials?.rememberMe === "true" || false,
           };
         }
-        // Return null if login failed
         return null;
       },
     }),
   ],
 
   session: {
-    strategy: "jwt", // store session data in JWT tokens, not DB
+    strategy: "jwt",
   },
 
   callbacks: {
-    // Runs whenever JWT is created or updated
-    async jwt(params: {
-      token: JWT;
-      user: User | AdapterUser;
-      account: Account | null;
-      profile?: Profile;
-      trigger?: "signIn" | "signUp" | "update";
-      isNewUser?: boolean;
-      session?: any;
-    }): Promise<JWT> {
-      const { token, user } = params;
-
-      // On first sign in, add tokens and role to JWT
+    async jwt({ token, user }) {
+      // On initial sign in
       if (user) {
-        const u = user as MyUser & { name?: string };
+        console.log("Storing tokens on sign in:", user.access, user.refresh);
         return {
           ...token,
-          access: u.access,
-          refresh: u.refresh,
-          accessTokenExpires: Date.now() + 15 * 60 * 1000, // 15 min expiry
-          role: u.role,
-          email: u.email ?? undefined,
-          name: u.name ?? undefined,
-          rememberMe: u.rememberMe ?? false,
+          access: user.access,
+          refresh: user.refresh,
+          role: user.role,
+          email: user.email,
+          name: user.name,
           error: null,
         };
       }
 
-      // If token is still valid, return it unchanged
-      if (
-        typeof token.accessTokenExpires === "number" &&
-        Date.now() < token.accessTokenExpires
-      ) {
-        return token;
+      // On subsequent calls, try refresh once
+      console.log("Refreshing with token:", token.refresh);
+
+      // If refresh failed before, don't retry infinitely
+      if (token.error === "RefreshAccessTokenError") {
+        return { ...token };
       }
 
-      // Otherwise, token expired, try to refresh it
-      return refreshAccessToken(token as MyToken);
+      // Attempt refresh
+      return await refreshAccessToken(token as MyToken);
     },
 
-    // Customize session object sent to client
     async session({ session, token }) {
       session.user = {
         ...(session.user || {}),
         email: token.email ?? undefined,
         role: typeof token.role === "string" ? token.role : undefined,
       };
-      // Attach name directly to session.user (even if not in type)
       if (typeof token.name === "string") {
         (session.user as any).name = token.name;
       }
       (session as any).access = token.access ?? undefined;
+      (session as any).error = token.error ?? null;
       return session;
     },
   },
 
-  // Configure session cookie security settings
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
