@@ -2,7 +2,7 @@ import React from 'react'
 import TestimonyCard from './TestimonyCard'
 const Alumni = () => {
     return (
-        <div className='
+        <div id="testimonials" className='
         bg-[#f7faff]
         py-14
         px-10 sm:px-30

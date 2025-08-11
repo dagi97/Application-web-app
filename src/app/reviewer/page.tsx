@@ -89,19 +89,19 @@ export default function ReviewerDashboard() {
     selectedFilter === "all"
       ? applications
       : applications.filter((app) => {
-          const reviewDetail = reviewDetailsMap[app.application_id];
-          if (selectedFilter === "underReview") {
-            return (
-              reviewDetail &&
-              reviewDetail.review_details != null &&
-              app.status !== "accepted" &&
-              app.status !== "rejected"
-            );
-          } else if (selectedFilter === "complete") {
-            return app.status === "rejected" || app.status === "accepted";
-          }
-          return true;
-        });
+        const reviewDetail = reviewDetailsMap[app.application_id];
+        if (selectedFilter === "underReview") {
+          return (
+            reviewDetail &&
+            reviewDetail.review_details != null &&
+            app.status !== "accepted" &&
+            app.status !== "rejected"
+          );
+        } else if (selectedFilter === "complete") {
+          return app.status === "rejected" || app.status === "accepted";
+        }
+        return true;
+      });
 
   filteredApplications = [...filteredApplications].sort((a, b) => {
     if (sortBy === "date") {
@@ -140,33 +140,30 @@ export default function ReviewerDashboard() {
           <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-2">
               <button
-                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${
-                  selectedFilter === "all"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "all"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  }`}
                 onClick={() => setSelectedFilter("all")}
                 type="button"
               >
                 All
               </button>
               <button
-                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${
-                  selectedFilter === "underReview"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "underReview"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  }`}
                 onClick={() => setSelectedFilter("underReview")}
                 type="button"
               >
                 Under Review
               </button>
               <button
-                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${
-                  selectedFilter === "complete"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
-                }`}
+                className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "complete"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  }`}
                 onClick={() => setSelectedFilter("complete")}
                 type="button"
               >
@@ -245,11 +242,10 @@ export default function ReviewerDashboard() {
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i + 1}
-                  className={`flex items-center justify-center w-9 h-9 rounded-md border cursor-pointer ${
-                    currentPage === i + 1
+                  className={`flex items-center justify-center w-9 h-9 rounded-md border cursor-pointer ${currentPage === i + 1
                       ? "border-indigo-600 bg-indigo-600 text-white"
                       : "border-gray-300 bg-white hover:bg-gray-50"
-                  }`}
+                    }`}
                   onClick={() => setCurrentPage(i + 1)}
                 >
                   {i + 1}

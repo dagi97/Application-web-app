@@ -162,7 +162,7 @@ const Profile = () => {
         setProfileUpdateStatus("error");
         setProfileUpdateMessage(
           (result as any).message ||
-            "Failed to update profile. Please try again."
+          "Failed to update profile. Please try again."
         );
         setShowProfileToast(true);
       }
@@ -247,8 +247,8 @@ const Profile = () => {
       setPasswordChangeStatus("error");
       setPasswordChangeMessage(
         result.details ||
-          result.message ||
-          "Failed to update password. Please check your current password and try again."
+        result.message ||
+        "Failed to update password. Please check your current password and try again."
       );
       setShowPasswordToast(true);
     }

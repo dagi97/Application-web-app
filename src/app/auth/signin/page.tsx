@@ -12,7 +12,7 @@ const SignIn = () => {
   type FormData = {
     password: string;
     email: string;
-    role:string;
+    role: string;
     rememberMe?: boolean;
   };
   const onSubmit = (data: FormData) => {
@@ -24,11 +24,11 @@ const SignIn = () => {
     watch,
     formState: { errors },
   } = useForm<FormData>();
+  const { login, loading, loginError } = useAuth();
   const hasError = errors.password || errors.email;
-const { login, loading } = useAuth();
   return (
     <div className="bg-[#F9FAFB]">
-      <HeaderAuth text= "Create Account"/>
+      <HeaderAuth text="Create Account" />
       <AuthLayout>
         <AuthHeader
           title="Sign in to your account"
@@ -50,6 +50,7 @@ const { login, loading } = useAuth();
           }
         />
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
+          <p className="text-red-500 text-sm mt-2">{loginError}</p>
           <div className="w-full border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
             <div className="w-full flex flex-col gap-1">
               <InputField
@@ -101,7 +102,7 @@ const { login, loading } = useAuth();
           <Button text={loading ? "Signing in..." : "Sign In"} disabled={loading} />
         </form>
       </AuthLayout>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

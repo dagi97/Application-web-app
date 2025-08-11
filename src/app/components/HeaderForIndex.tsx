@@ -17,39 +17,43 @@ const HeaderForIndex = () => {
               rel="noopener noreferrer"
               className="cursor-pointer"
             >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
+              <img src={"/a2sv-logo.svg"} />
             </a>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium pr-28">
             <a
-              href="#"
+              href="#journey"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
             >
               The Journey
             </a>
             <a
-              href="#"
+              href="#about"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
             >
               About
             </a>
             <a
-              href="#"
+              href="#testimonials"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
             >
               Testimonials
             </a>
-            <button className="text-white bg-[#4338CA] px-4 py-2 rounded-md mt-2 font-medium mb-2">
-              Apply Now
-            </button>
+            <Link href="/auth/register">
+              <button className="text-white bg-[#4338CA] px-4 py-2 rounded-md mt-2 font-medium mb-2">
+                Apply Now
+              </button>
+            </Link>
+            <Link href="/auth/signin">
+              <button
+                className="text-white bg-[#4338CA] px-8 py-2 rounded-md mt-2 font-medium mb-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -84,32 +88,40 @@ const HeaderForIndex = () => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-4 space-y-2 flex flex-col">
             <a
-              href="#"
+              href="#journey"
               className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
               onClick={() => setMobileMenuOpen(false)}
             >
               The Journey
             </a>
             <a
-              href="#"
+              href="#about"
               className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </a>
             <a
-              href="#"
+              href="#testimonials"
               className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
               onClick={() => setMobileMenuOpen(false)}
             >
               Testimonials
             </a>
-            <button
-              className="w-[150px] text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
+            <a
+              href="/auth/register"
+              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
               onClick={() => setMobileMenuOpen(false)}
             >
               Apply Now
-            </button>
+            </a>
+            <a
+              href="/auth/signin"
+              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </a>
           </div>
         </div>
       )}

@@ -135,7 +135,7 @@ const ApplicationCard: FC<Props> = ({
                   },
                   body: JSON.stringify({ status: "under_review" }),
                 }
-              ).catch(() => {});
+              ).catch(() => { });
               router.push(
                 `reviewer/reviewdetails/${application_id}?reviewerName=${encodeURIComponent(
                   reviewerName

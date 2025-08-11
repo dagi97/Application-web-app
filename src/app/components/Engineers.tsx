@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 const Engineers = () => {
     return (
-        <div className='px-10 sm:px-30    
+        <div id="about" className='px-10 sm:px-30    
         py-20      
         bg-[#F3F4F6]        
         flex flex-col 
