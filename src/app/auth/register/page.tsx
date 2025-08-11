@@ -9,6 +9,8 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import Footer from "@/app/components/Footer";
 import HeaderAuth from "@/app/components/HeaderAuth";
+import Toaster from "@/app/components/Toaster";
+import { useState, useEffect } from "react";
 
 type FormData = {
   name: string;
@@ -21,15 +23,50 @@ const Register = () => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<FormData>();
 
-  const { register: registerUser, loading } = useAuth();
+  const {
+    register: registerUser,
+    loading,
+    toastMessage,
+    toastType,
+    clearToast,
+  } = useAuth();
 
-  const onSubmit = (data: FormData) => {
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  useEffect(() => {
+    if (toastMessage && !toast.show) {
+      setToast({
+        show: true,
+        message: toastMessage,
+        type: toastType || "success",
+      });
+    }
+  }, [toastMessage, toastType, toast.show]);
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast((prev) => ({ ...prev, show: false }));
+        clearToast();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show, clearToast]);
+
+  const showLocalToast = (message: string, type: "success" | "error") => {
+    setToast({ show: true, message, type });
+  };
+
+  const onSubmit = async (data: FormData) => {
     if (data.password !== data.confirmPassword) {
-      alert("Passwords don't match");
+      showLocalToast("Passwords don't match", "error");
       return;
     }
 
@@ -41,8 +78,8 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-[#F9FAFB]">
-      <HeaderAuth text="Sign in"/>
+    <div className="bg-[#F9FAFB] relative">
+      <HeaderAuth text="Sign in" />
       <AuthLayout>
         <AuthHeader
           title="Create a new applicant account"
@@ -111,7 +148,14 @@ const Register = () => {
           <Button text="Create account" />
         </form>
       </AuthLayout>
-      <Footer/>
+      <Footer />
+
+      <Toaster
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 };

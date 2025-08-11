@@ -1,13 +1,16 @@
 "use client";
+
 import { useForm } from "react-hook-form";
 import AuthHeader from "@/app/components/AuthHeader";
 import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import { useAuth } from "@/hooks/useAuth";
-import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import HeaderAuth from "@/app/components/HeaderAuth";
+import Toaster from "@/app/components/Toaster";
+import { useEffect, useState } from "react";
+
 const SignIn = () => {
   type FormData = {
     password: string;
@@ -15,17 +18,45 @@ const SignIn = () => {
     role: string;
     rememberMe?: boolean;
   };
-  const onSubmit = (data: FormData) => {
-    login(data);
-  };
+
+  const { login, loading, toastMessage, toastType, clearToast } = useAuth();
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<FormData>();
-  const { login, loading, loginError } = useAuth();
-  const hasError = errors.password || errors.email;
+
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  useEffect(() => {
+    if (toastMessage && !toast.show) {
+      setToast({
+        show: true,
+        message: toastMessage,
+        type: toastType || "success",
+      });
+    }
+  }, [toastMessage, toastType, toast.show]);
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast((prev) => ({ ...prev, show: false }));
+        clearToast();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show, clearToast]);
+
+  const onSubmit = (data: FormData) => {
+    login(data);
+  };
+
   return (
     <div className="bg-[#F9FAFB]">
       <HeaderAuth text="Create Account" />
@@ -36,7 +67,7 @@ const SignIn = () => {
             <>
               <a
                 href="/"
-                className="text-[#4F46E5] hover:underline pr-1 border-r-1 border-black"
+                className="text-[#4F46E5] hover:underline pr-1 border-r border-black"
               >
                 Back to Home
               </a>{" "}
@@ -50,7 +81,6 @@ const SignIn = () => {
           }
         />
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-          <p className="text-red-500 text-sm mt-2">{loginError}</p>
           <div className="w-full border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
             <div className="w-full flex flex-col gap-1">
               <InputField
@@ -93,16 +123,26 @@ const SignIn = () => {
             </label>
             <a
               href="/auth/forgot-password"
-              className="text-[#4F46E5] hover:underline font-[500] "
+              className="text-[#4F46E5] hover:underline font-[500]"
             >
               Forgot your password?
             </a>
           </div>
 
-          <Button text={loading ? "Signing in..." : "Sign In"} disabled={loading} />
+          <Button
+            text={loading ? "Signing in..." : "Sign In"}
+            disabled={loading}
+          />
         </form>
       </AuthLayout>
       <Footer />
+
+      <Toaster
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 };
