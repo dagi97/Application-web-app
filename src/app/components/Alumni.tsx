@@ -30,33 +30,34 @@ const Alumni = () => {
                     name="Abel Tadesse"
                     title="Software Engineer"
                     company="Google"
-                    image="/images/abel-tadesse.png"
+                    image="/images/abel.png"
 
                 />
                 <TestimonyCard
-                    testimony={`"${`A2SV completely changed the trajectory of my career. The training is intense, but
-                            the community and the opportunities are
-                            unparalleled. I'm now at my dream
-                            company, and I owe it all to A2SV.`}"`}
+                    testimony={`"${`The problem-solving skills I learned at
+                        A2SV are invaluable. The mentors push
+                        you to be your best, and you're
+                        surrounded by people who are just as
+                        passionate as you are.`}"`}
 
 
-                    name="Abel Tadesse"
+                    name="Bethlehem Tadesse"
                     title="Software Engineer"
-                    company="Google"
-                    image="/images/abel-tadesse.png"
+                    company="Amazon"
+                    image="/images/bethlehem.png"
 
                 />
                 <TestimonyCard
-                    testimony={`"${`A2SV completely changed the trajectory of my career. The training is intense, but
-                            the community and the opportunities are
-                            unparalleled. I'm now at my dream
-                            company, and I owe it all to A2SV.`}"`}
+                    testimony={`"${`A2SV is more than a bootcamp. It's a
+                    family that supports you long after you've
+                    graduated. The network you build here is
+                    for life.`}"`}
 
 
-                    name="Abel Tadesse"
+                    name="Caleb Alemayehu"
                     title="Software Engineer"
-                    company="Google"
-                    image="/images/abel-tadesse.png"
+                    company="Palantir"
+                    image="/images/caleb.png"
 
                 />
 
