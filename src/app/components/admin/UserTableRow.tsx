@@ -49,7 +49,7 @@ const UserTableRow = ({ user, onToast }: { user: User, onToast: (message: string
           {status.text}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right block md:table-cell">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-right block md:table-cell">
         <Link href={`/admin/users/edit_user/${user.id}`}>
           <span className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</span>
         </Link>
