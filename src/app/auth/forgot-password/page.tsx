@@ -8,25 +8,52 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import HeaderForIndex from "@/app/components/HeaderForIndex";
 import Footer from "@/app/components/Footer";
+import { useState, useEffect } from "react";
+import Toaster from "@/app/components/Toaster";
+
 type FormData = {
   email: string;
 };
+
 const ForgotPassword = () => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<FormData>();
-  const hasError = errors.email;
-  const { forgotPassword } = useAuth();
+
+  const { forgotPassword, toastMessage, toastType, clearToast } = useAuth();
+
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success" as "success" | "error",
+  });
+
+  useEffect(() => {
+    if (toastMessage && !toast.show) {
+      setToast({
+        show: true,
+        message: toastMessage,
+        type: toastType || "success",
+      });
+
+      const timer = setTimeout(() => {
+        setToast((prev) => ({ ...prev, show: false }));
+        clearToast();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage, toastType, clearToast, toast.show]);
 
   const onSubmit = async (data: FormData) => {
     await forgotPassword(data.email);
   };
+
   return (
     <div className="bg-[#F9FAFB]">
-      <HeaderForIndex/>
+      <HeaderForIndex />
       <AuthLayout>
         <AuthHeader
           title="Forgot your password?"
@@ -58,12 +85,19 @@ const ForgotPassword = () => {
         </form>
         <Link
           className="block text-sm text-[#4F46E5] font-medium hover:underline"
-          href="/auth/signin "
+          href="/auth/signin"
         >
           Back to login
         </Link>
       </AuthLayout>
-      <Footer/>
+      <Footer />
+
+      <Toaster
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
     </div>
   );
 };

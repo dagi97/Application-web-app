@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn, useSession, signOut, getSession } from "next-auth/react";
@@ -27,6 +25,15 @@ export const useAuth = () => {
   const [forgotPasswordMutation] = useForgotPasswordMutation();
   const [resetPasswordMutation] = useResetPasswordMutation();
 
+  // Toast messages state
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error" | null>(null);
+
+  const clearToast = () => {
+    setToastMessage(null);
+    setToastType(null);
+  };
+
   const login = async (data: { email: string; password: string }) => {
     setLoading(true);
     setLoginError(null); // clear previous errors
@@ -39,6 +46,8 @@ export const useAuth = () => {
 
     if (res?.error) {
       setLoginError("Invalid email or password");
+      setToastMessage("Invalid email or password");
+      setToastType("error");
       return;
     }
 
@@ -64,35 +73,52 @@ export const useAuth = () => {
   const register = async (data: RegisterData) => {
     try {
       await registerMutation(data).unwrap();
-      alert("Account created! You can now sign in.");
-      router.push("/auth/signin");
+      setToastMessage("Account created! You can now sign in.");
+      setToastType("success");
+      setTimeout(() => {
+        router.push("/auth/signin");
+      }, 3000);
     } catch (err: any) {
-      alert("Registration failed");
+      setToastMessage("Registration failed");
+      setToastType("error");
       console.error(err);
     }
   };
 
   const logout = () => {
-    sessionStorage.removeItem("access_token"); // clear token on logout
+    sessionStorage.removeItem("access_token");
     signOut({ callbackUrl: "/auth/signin" });
   };
 
   const forgotPassword = async (email: string) => {
     try {
       const callbackUrl = `${window.location.origin}/auth/reset-password`;
-      await forgotPasswordMutation({ email, callback_url: callbackUrl }).unwrap();
-      alert("If the email exists, a password reset link has been sent.");
+      await forgotPasswordMutation({
+        email,
+        callback_url: callbackUrl,
+      }).unwrap();
+      setToastMessage(
+        "If the email exists, a password reset link has been sent."
+      );
+      setToastType("success");
     } catch (err: any) {
-      alert(err?.data?.message || "Failed to send reset link");
+      setToastMessage(err?.data?.message || "Failed to send reset link");
+      setToastType("error");
     }
   };
 
   const resetPassword = async (token: string, newPassword: string) => {
     try {
-      await resetPasswordMutation({ token, new_password: newPassword }).unwrap();
+      await resetPasswordMutation({
+        token,
+        new_password: newPassword,
+      }).unwrap();
       return { success: true };
     } catch (err: any) {
-      return { success: false, error: err?.data?.message || "Failed to reset password" };
+      return {
+        success: false,
+        error: err?.data?.message || "Failed to reset password",
+      };
     }
   };
 
@@ -102,7 +128,8 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (session?.error === "RefreshAccessTokenError") {
-      alert("Your session expired. Please log in again.");
+      setToastMessage("Your session expired. Please log in again.");
+      setToastType("error");
       sessionStorage.removeItem("access_token"); // clear token on error
       logout();
     }
@@ -117,5 +144,8 @@ export const useAuth = () => {
     loading,
     loginError,
     session,
+    toastMessage,
+    toastType,
+    clearToast,
   };
 };
