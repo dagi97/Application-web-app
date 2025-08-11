@@ -16,6 +16,9 @@ export default function PersonalInfoStep() {
   const handleNext = () => {
     router.push("/applicant/application/coding-profiles");
   };
+  const handleBack = () => {
+    router.push("/");
+  };
 
   return (
     <>
@@ -120,7 +123,7 @@ export default function PersonalInfoStep() {
               variant="secondary"
               size="small"
               className="bg-gray-100 text-gray-800 px-3 py-1.5 text-sm rounded-md"
-              onClick={() => router.back()}
+              onClick={handleBack}
             >
               Back
             </Button>
