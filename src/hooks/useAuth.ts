@@ -91,6 +91,7 @@ export const useAuth = () => {
   };
 
   const forgotPassword = async (email: string) => {
+    setLoading(true);
     try {
       const callbackUrl = `${window.location.origin}/auth/reset-password`;
       await forgotPasswordMutation({
@@ -104,10 +105,12 @@ export const useAuth = () => {
     } catch (err: any) {
       setToastMessage(err?.data?.message || "Failed to send reset link");
       setToastType("error");
-    }
+    }finally {
+    setLoading(false);}
   };
 
   const resetPassword = async (token: string, newPassword: string) => {
+    setLoading(true);
     try {
       await resetPasswordMutation({
         token,
@@ -119,7 +122,8 @@ export const useAuth = () => {
         success: false,
         error: err?.data?.message || "Failed to reset password",
       };
-    }
+    }finally {
+    setLoading(false);}
   };
 
   useEffect(() => {
