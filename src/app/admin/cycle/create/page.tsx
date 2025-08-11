@@ -14,7 +14,9 @@ type FormValue = {
   start_date: string;
   end_date: string;
 };
-
+// This component allows admins to create a new cycle with a form
+// It includes fields for cycle name, country, start date, and end date.
+//  It handles form submission, validation, and displays success/error messages.
 export default function CreateCycle() {
   const { data: session } = useSession();
   const accessToken = session?.access;
