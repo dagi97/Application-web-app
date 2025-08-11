@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image";
-// import logo from "../../../public/a2sv-logo.svg":
 
 const HeaderAuth = ({ text }: { text: string }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -11,6 +10,7 @@ const HeaderAuth = ({ text }: { text: string }) => {
     <header className="bg-white shadow-[0px_1px_2px_0px_#0000000D] backdrop-blur-[12px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <div className="text-2xl font-bold">
             <a
               href="https://a2sv.org"
@@ -30,32 +30,20 @@ const HeaderAuth = ({ text }: { text: string }) => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium pr-28">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
             >
-              The Journey
-            </a>
-            <a
-              href="#"
-              className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
-            >
-              About
-            </a>
-            <a
-              href="#"
-              className="py-2 border-b-2 border-transparent text-[#6B7280] hover:text-[#829FAB]"
-            >
-              Testimonials
-            </a>
-            <a
+              Home
+            </Link>
+            <Link
               href={`/auth/${
                 text === "Create Account" ? "register" : "signin"
               }`}
-              className="text-[#4F46E5] hover:underline "
+              className="text-[#4F46E5] hover:underline"
             >
               {text}
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -65,7 +53,6 @@ const HeaderAuth = ({ text }: { text: string }) => {
               className="text-gray-600 hover:text-gray-900 p-2 focus:outline-none"
               aria-label="Open menu"
             >
-              {/* Hamburger Icon */}
               <svg
                 className="h-6 w-6"
                 fill="none"
@@ -89,35 +76,22 @@ const HeaderAuth = ({ text }: { text: string }) => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-4 space-y-2 flex flex-col">
-            <a
-              href="#"
+            <Link
+              href="/"
               className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
               onClick={() => setMobileMenuOpen(false)}
             >
-              The Journey
-            </a>
-            <a
-              href="#"
-              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
-            </a>
-            <a
-              href="#"
-              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Testimonials
-            </a>
-            <a
+              Home
+            </Link>
+            <Link
               href={`/auth/${
                 text === "Create Account" ? "register" : "signin"
               }`}
-              className="text-[#4F46E5] hover:underline "
+              className="text-[#4F46E5] hover:underline"
+              onClick={() => setMobileMenuOpen(false)}
             >
               {text}
-            </a>
+            </Link>
           </div>
         </div>
       )}
