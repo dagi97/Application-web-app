@@ -9,6 +9,7 @@ import { Textarea } from "@/app/components/Textarea";
 import Button from "@/app/components/Button";
 import Toaster from "@/app/components/Toaster";
 import Header from "@/app/components/ApplicantHeader";
+import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 
 import { useApplicationForm } from "@/lib/context/ApplicationFormContext";
 import { useSubmitApplicationMutation } from "@/lib/redux/api/applicationApi";
@@ -253,6 +254,7 @@ export default function EssaysResumeStep() {
           </div>
         </form>
       </div>
+      <Footer_Variant1 />
     </>
   );
 }

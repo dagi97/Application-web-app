@@ -42,8 +42,8 @@ const AdminNav = () => {
           </li>
           <li>
             <Link
-              href="/admin/cycles"
-              className={IsActive('/admin/cycles') ? 'border-b-2 border-[#6366F1] text-[#111827]' : 'text-[#6B7280]'}
+              href="/admin/cycle"
+              className={IsActive('/admin/cycle') ? 'border-b-2 border-[#6366F1] text-[#111827]' : 'text-[#6B7280]'}
             >
               Cycles
             </Link>

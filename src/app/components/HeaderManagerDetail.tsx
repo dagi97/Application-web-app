@@ -22,7 +22,7 @@ const HeaderManagerDetail = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link
-            href="/manager/dashboard"
+            href="/manager"
             className="flex items-center bg-white"
             onMouseEnter={() => onLeftHoverChange && onLeftHoverChange(true)}
             onMouseLeave={() => onLeftHoverChange && onLeftHoverChange(false)}
@@ -72,7 +72,7 @@ const HeaderManagerDetail = ({
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="/manager/dashboard"
+              href="/manager"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard

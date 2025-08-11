@@ -10,6 +10,7 @@ import Toaster from "@/app/components/Toaster";
 import { useApplicationForm } from "@/hooks/ApplicationFormContext";
 import { useEditApplicationMutation } from "@/lib/redux/api/applicationApi";
 import Header from "@/app/components/ApplicantHeader";
+import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 
 export default function EssaysResumeStep() {
   const router = useRouter();
@@ -231,6 +232,7 @@ export default function EssaysResumeStep() {
           </div>
         </form>
       </div>
+      <Footer_Variant1 />
     </>
   );
 }
