@@ -40,7 +40,7 @@ export default function DropDown({ reviewers, appId, onAssignReviewer, currentSt
             </div>
 
             {isOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-[9999]">
                     <div className="py-1">
                         <a
                             href={`/manager/detail/${appId}`}
@@ -62,7 +62,7 @@ export default function DropDown({ reviewers, appId, onAssignReviewer, currentSt
                             </button>
 
                             {isAssignOpen && (
-                                <div className="absolute left-full top-0 ml-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                <div className="absolute left-full top-0 ml-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-[10000]">
                                     <div className="py-1">
                                         <div className="px-3 py-2">
                                             <input
