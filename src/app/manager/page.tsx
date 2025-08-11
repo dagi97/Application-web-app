@@ -8,81 +8,23 @@ import StatCard from "@/app/components/StatCard";
 import TeamPerformance from "@/app/components/TeamPerformance";
 import Footer from "@/app/components/Footer";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import {
+    useAssignReviewerMutation,
+    useGetAllReviewersQuery,
+} from "@/lib/redux/api/managerApi";
 
 export default function DashboardPage() {
-    // Mock data for testing display
-    const [applications, setApplications] = useState<any[]>([
-        {
-            id: "8a610aca-a223-43a1-9c56-d9803a5e7999",
-            applicant_name: "Abebe Kebede",
-            status: "in_progress",
-            assigned_reviewer_name: "Abebeche Kebede",
-            submitted_at: "2025-07-25T23:14:36.257313+03:00"
-        },
-        {
-            id: "382db91c-270b-493f-902f-5f33694a4c2f",
-            applicant_name: "Full Name",
-            status: "pending_review",
-            assigned_reviewer_name: null,
-            submitted_at: "2025-07-29T16:15:07.600010+03:00"
-        },
-        {
-            id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-            applicant_name: "Sarah Johnson",
-            status: "accepted",
-            assigned_reviewer_name: "John Doe",
-            submitted_at: "2025-07-20T10:30:00.000000+03:00"
-        },
-        {
-            id: "b2c3d4e5-f6a7-8901-2345-678901bcdef",
-            applicant_name: "Michael Chen",
-            status: "rejected",
-            assigned_reviewer_name: "Jane Smith",
-            submitted_at: "2025-07-18T14:45:00.000000+03:00"
-        },
-        {
-            id: "c3d4e5f6-a7b8-9012-3456-789012cdefa",
-            applicant_name: "Emily Rodriguez",
-            status: "in_progress",
-            assigned_reviewer_name: "Mike Wilson",
-            submitted_at: "2025-07-22T09:15:00.000000+03:00"
-        }
-    ]);
-
-    const [loading, setLoading] = useState(false);
+    const [applications, setApplications] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Mock reviewers data
-    const reviewers = [
-        {
-            id: "223277f0-af11-44c5-843e-23afcb194ea8",
-            name: "John Doe",
-            email: "john@example.com",
-            full_name: "John Doe"
-        },
-        {
-            id: "334388g1-bg22-55c6-9544-34bgdc205fb9",
-            name: "Jane Smith",
-            email: "jane@example.com",
-            full_name: "Jane Smith"
-        },
-        {
-            id: "445499h2-ch33-66d7-1655-45ched306gc0",
-            name: "Mike Wilson",
-            email: "mike@example.com",
-            full_name: "Mike Wilson"
-        },
-        {
-            id: "5566aa3-di44-77e8-2766-56dfe407hd1",
-            name: "Abebeche Kebede",
-            email: "abebeche@example.com",
-            full_name: "Abebeche Kebede"
-        }
-    ];
-
     const { data: session, status } = useSession();
     const router = useRouter();
+
+    // Use Redux API hooks
+    const [assignReviewer] = useAssignReviewerMutation();
+    const { data: reviewersData, isLoading: reviewersLoading } = useGetAllReviewersQuery();
 
     // Redirect if not authenticated or not a manager
     useEffect(() => {
@@ -99,24 +41,127 @@ export default function DashboardPage() {
         }
     }, [session, status, router]);
 
-    // Mock assign reviewer function
+    // Helper to get access token from NextAuth session
+    const getAccessToken = async () => {
+        if (typeof window === "undefined") return null;
+
+        // Try to get NextAuth session first
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+
+        return session?.access || null;
+    };
+
+    // GET /manager/applications/ - List Applications
+    const fetchApplications = async () => {
+        try {
+            const token = await getAccessToken();
+
+            if (!token) {
+                setError("No access token found. Please sign in again.");
+                setLoading(false);
+                return;
+            }
+
+            const response = await fetch(
+                "https://a2sv-application-platform-backend-team2.onrender.com/manager/applications/",
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Manager API Response:", data);
+
+            if (data.success && data.data) {
+                const applicationsData = data.data.applications || [];
+                console.log("Applications from manager API:", applicationsData);
+
+                // For each application, get detailed information
+                const applicationsWithDetails = await Promise.all(
+                    applicationsData.map(async (app: any) => {
+                        try {
+                            const detailResponse = await fetch(
+                                `https://a2sv-application-platform-backend-team2.onrender.com/manager/applications/${app.id}`,
+                                {
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                }
+                            );
+
+                            if (detailResponse.ok) {
+                                const detailData = await detailResponse.json();
+                                console.log(`Detail API Response for app ${app.id}:`, detailData);
+                                if (detailData.success && detailData.data) {
+                                    // Merge the basic app data with the detailed data
+                                    const mergedApp = {
+                                        ...app,
+                                        ...detailData.data.application || detailData.data,
+                                        applicant_name:
+                                            app.applicant_name ||
+                                            detailData.data.applicant_name ||
+                                            detailData.data.application?.applicant_name ||
+                                            "Unknown",
+                                        submitted_at:
+                                            app.submitted_at ||
+                                            detailData.data.submitted_at ||
+                                            detailData.data.application?.submitted_at ||
+                                            detailData.data.created_at,
+                                        assigned_reviewer_name:
+                                            app.assigned_reviewer_name ||
+                                            detailData.data.assigned_reviewer_name ||
+                                            detailData.data.application?.assigned_reviewer_name ||
+                                            "Not Assigned",
+                                    };
+                                    console.log(`Merged app ${app.id}:`, mergedApp);
+                                    return mergedApp;
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Failed to fetch details for application ${app.id}:`, err);
+                        }
+
+                        // Return basic app data if detail fetch fails
+                        return {
+                            ...app,
+                            applicant_name: app.applicant_name || "Unknown",
+                            submitted_at: app.submitted_at || app.created_at,
+                            assigned_reviewer_name: app.assigned_reviewer_name || "Not Assigned",
+                        };
+                    })
+                );
+
+                console.log("Final applications with details:", applicationsWithDetails);
+                setApplications(applicationsWithDetails);
+            }
+        } catch (err) {
+            console.error("Failed to fetch applications:", err);
+            setError(err instanceof Error ? err.message : "Unknown error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Assign reviewer to application
     const handleAssignReviewer = async (
         applicationId: string,
         reviewerId: string
     ) => {
         try {
-            // Find the reviewer
-            const reviewer = reviewers.find(r => r.id === reviewerId);
-            const reviewerName = reviewer ? reviewer.full_name || reviewer.name : "Unknown";
+            await assignReviewer({ appId: applicationId, reviewer_id: reviewerId }).unwrap();
+            setSuccessMessage("Reviewer assigned successfully!");
 
-            // Update the application with the assigned reviewer
-            setApplications(prev => prev.map(app =>
-                app.id === applicationId
-                    ? { ...app, assigned_reviewer_name: reviewerName }
-                    : app
-            ));
-
-            setSuccessMessage(`Reviewer ${reviewerName} assigned successfully!`);
+            // Refresh applications to show updated assignment
+            await fetchApplications();
 
             // Clear success message after 3 seconds
             setTimeout(() => setSuccessMessage(null), 3000);
@@ -129,7 +174,13 @@ export default function DashboardPage() {
         }
     };
 
-    const isLoading = loading || status === "loading";
+    useEffect(() => {
+        if (session && status === "authenticated") {
+            fetchApplications();
+        }
+    }, [session, status]);
+
+    const isLoading = loading || reviewersLoading || status === "loading";
 
     // Loading state
     if (status === "loading" || !session) {
@@ -168,6 +219,8 @@ export default function DashboardPage() {
             </>
         );
     }
+
+    const reviewers = reviewersData?.data?.reviewers || [];
 
     // Main content state
     return (
