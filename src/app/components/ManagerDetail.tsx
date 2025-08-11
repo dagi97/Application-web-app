@@ -80,14 +80,6 @@ const ManagerDetailPage: React.FC<ManagerDetailPageProps> = ({
                         </h3>
                         <div className="mt-2 flex flex-wrap gap-2 items-center">
                           <a
-                            href={`https://github.com/${reviewDetail.github}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-semibold text-[#4F46E5] hover:text-[#182E6F] px-3 py-1 rounded break-words"
-                          >
-                            GitHub
-                          </a>
-                          <a
                             href={`https://leetcode.com/${reviewDetail.leetcode}`}
                             target="_blank"
                             rel="noopener noreferrer"

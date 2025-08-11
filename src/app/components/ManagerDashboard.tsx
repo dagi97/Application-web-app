@@ -13,6 +13,14 @@ import {
     useGetAllReviewersQuery
 } from "@/lib/redux/api/managerApi";
 
+interface ExtendedSession {
+    user?: {
+        name?: string;
+        role?: string;
+    };
+    access?: string;
+}
+
 export default function DashboardPage() {
     const [applications, setApplications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -36,7 +44,8 @@ export default function DashboardPage() {
             return;
         }
 
-        if (session.user?.role !== "manager") {
+        const extendedSession = session as ExtendedSession;
+        if (extendedSession.user?.role !== "manager") {
             router.push("/unauthorized");
             return;
         }
@@ -45,10 +54,11 @@ export default function DashboardPage() {
     // GET /manager/applications/ - List Applications with full details
     const fetchApplications = async () => {
         try {
+            const extendedSession = session as ExtendedSession;
             const response = await fetch("https://a2sv-application-platform-backend-team2.onrender.com/manager/applications/", {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${session?.access}`,
+                    "Authorization": `Bearer ${extendedSession?.access}`,
                 },
             });
 
@@ -67,7 +77,7 @@ export default function DashboardPage() {
                             const detailResponse = await fetch(`https://a2sv-application-platform-backend.onrender.com/applications/${app.id}`, {
                                 headers: {
                                     "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${session?.access}`,
+                                    "Authorization": `Bearer ${extendedSession?.access}`,
                                 },
                             });
 
@@ -100,41 +110,42 @@ export default function DashboardPage() {
     // PATCH /manager/applications/{application_id}/assign/ - Assign Reviewer
     const handleAssignReviewer = async (applicationId: string, reviewerId: string) => {
         try {
-            await assignReviewer({ appId: applicationId, reviewer_id: reviewerId }).unwrap();
-            setSuccessMessage("Reviewer assigned successfully!");
+            const result = await assignReviewer({
+                appId: applicationId,
+                reviewer_id: reviewerId
+            }).unwrap();
 
-            // Refresh applications to show updated assignment
-            await fetchApplications();
-
-            // Clear success message after 3 seconds
-            setTimeout(() => setSuccessMessage(null), 3000);
-
-            return { success: true };
+            if (result !== undefined) {
+                setSuccessMessage("Reviewer assigned successfully!");
+                await fetchApplications();
+                setTimeout(() => setSuccessMessage(null), 3000);
+            }
         } catch (err) {
             console.error("Failed to assign reviewer:", err);
             setError(err instanceof Error ? err.message : "Unknown error");
-            throw err;
         }
     };
 
-    // PATCH /manager/applications/{application_id}/decide/ - Decide Application
+    // PATCH /manager/applications/{application_id}/decide/ - Make Decision
     const handleDecideApplication = async (applicationId: string, status: string, decisionNotes: string) => {
         try {
-            await decideApplication({
+            const result = await decideApplication({
                 appId: applicationId,
                 status: status as "accepted" | "rejected",
                 decision_notes: decisionNotes
             }).unwrap();
 
-            setSuccessMessage(`Application ${status} successfully!`);
+            if (result !== undefined) {
+                setSuccessMessage(`Application ${status} successfully!`);
 
-            // Refresh applications to show updated status
-            await fetchApplications();
+                // Refresh applications to show updated status
+                await fetchApplications();
 
-            // Clear success message after 3 seconds
-            setTimeout(() => setSuccessMessage(null), 3000);
+                // Clear success message after 3 seconds
+                setTimeout(() => setSuccessMessage(null), 3000);
 
-            return { success: true };
+                return { success: true };
+            }
         } catch (err) {
             console.error("Failed to make decision:", err);
             setError(err instanceof Error ? err.message : "Unknown error");
@@ -142,9 +153,8 @@ export default function DashboardPage() {
         }
     };
 
-
     useEffect(() => {
-        if (session && session.access) {
+        if (session && (session as ExtendedSession).access) {
             const loadData = async () => {
                 setLoading(true);
                 try {
@@ -165,7 +175,7 @@ export default function DashboardPage() {
     if (status === "loading" || !session) {
         return (
             <div className="flex flex-col min-h-screen">
-                <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+                <HeaderManagerDetail managerName="Manager" />
                 <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-lg">Loading...</div>
@@ -177,9 +187,10 @@ export default function DashboardPage() {
     }
 
     if (error) {
+        const extendedSession = session as ExtendedSession;
         return (
             <div className="flex flex-col min-h-screen">
-                <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+                <HeaderManagerDetail managerName={extendedSession?.user?.name || "Manager"} />
                 <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-lg text-red-600">Error: {error}</div>
@@ -191,10 +202,11 @@ export default function DashboardPage() {
     }
 
     const reviewers = reviewersData?.data?.reviewers || [];
+    const extendedSession = session as ExtendedSession;
 
     return (
         <div className="flex flex-col min-h-screen">
-            <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+            <HeaderManagerDetail managerName={extendedSession?.user?.name || "Manager"} />
 
             {successMessage && (
                 <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative ml-[159px] mt-4 mr-4">

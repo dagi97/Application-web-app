@@ -12,6 +12,7 @@ import HeaderAuth from "@/app/components/HeaderAuth";
 import Toaster from "@/app/components/Toaster";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import SuspenseWrapper from "@/app/components/SuspenseWrapper";
 
 type FormData = {
   name: string;
@@ -20,7 +21,7 @@ type FormData = {
   confirmPassword: string;
 };
 
-const Register = () => {
+function RegisterContent() {
   const {
     register,
     handleSubmit,
@@ -99,113 +100,118 @@ const Register = () => {
             </>
           }
         />
-
         <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           <div className="w-full border-[1.5px] border-[#D1D5DB] rounded-[6px] overflow-hidden">
-            {/* Full name */}
-            <InputField
-              isLast={false}
-              type="text"
-              placeholder="Full Name"
-              {...register("name", { required: "Full name is required" })}
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs">{errors.name.message}</p>
-            )}
-
-            {/* Email */}
-            <InputField
-              isLast={false}
-              type="email"
-              placeholder="Email address"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Invalid email format",
-                },
-              })}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs">{errors.email.message}</p>
-            )}
-
-            {/* Password */}
-            <div className="relative">
+            <div className="w-full flex flex-col gap-1">
               <InputField
                 isLast={false}
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                {...register("password", { required: "Password is required" })}
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-red-500 text-xs">{errors.password.message}</p>
-            )}
-
-            {/* Confirm Password */}
-            <div className="relative">
-              <InputField
-                isLast={true}
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm password"
-                {...register("confirmPassword", {
-                  required: "Confirm Password is required",
+                type="text"
+                placeholder="Full Name"
+                {...register("name", {
+                  required: "Full name is required",
+                  minLength: {
+                    value: 2,
+                    message: "Name must be at least 2 characters",
+                  },
                 })}
-                className="pr-10"
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((v) => !v)}
-                aria-label={
-                  showConfirmPassword ? "Hide password" : "Show password"
-                }
-                className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name.message}</p>
+              )}
+              <InputField
+                isLast={false}
+                type="email"
+                placeholder="user@example.com"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email format",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email.message}</p>
+              )}
+              <div className="relative">
+                <InputField
+                  isLast={false}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters",
+                    },
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs">{errors.password.message}</p>
+              )}
+              <div className="relative">
+                <InputField
+                  isLast={true}
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-500" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-500" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
           </div>
-
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-xs">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-
-          <div className="w-full h-6" />
           <Button
             text={loading ? "Creating account..." : "Create account"}
+            type="submit"
             disabled={loading}
           />
         </form>
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          show={toast.show}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       </AuthLayout>
       <Footer />
-
-      <Toaster
-        message={toast.message}
-        type={toast.type}
-        show={toast.show}
-        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-      />
     </div>
+  );
+}
+
+const Register = () => {
+  return (
+    <SuspenseWrapper>
+      <RegisterContent />
+    </SuspenseWrapper>
   );
 };
 

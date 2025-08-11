@@ -17,7 +17,7 @@ interface RegisterData {
 export const useAuth = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams?.get("redirect") || "/";
   const { data: session, status } = useSession();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,37 +36,58 @@ export const useAuth = () => {
 
   const login = async (data: { email: string; password: string }) => {
     setLoading(true);
-    setLoginError(null); // clear previous errors
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
-    setLoading(false);
+    setLoginError(null);
+    
+    try {
+      console.log("Attempting login with:", { email: data.email });
+      
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
 
-    if (res?.error) {
-      setLoginError("Invalid email or password");
-      setToastMessage("Invalid email or password");
+      console.log("SignIn response:", res);
+
+      if (res?.error) {
+        console.error("Login error:", res.error);
+        setLoginError("Invalid email or password");
+        setToastMessage("Invalid email or password");
+        setToastType("error");
+        return;
+      }
+
+      if (res?.ok) {
+        console.log("Login successful, getting session...");
+        const newSession = await getSession();
+        console.log("New session:", newSession);
+        
+        const accessToken = (newSession as any)?.access;
+        if (accessToken) {
+          sessionStorage.setItem("access_token", accessToken);
+        }
+
+        if (newSession?.user?.role) {
+          const role = newSession.user.role;
+          console.log("User role:", role);
+          
+          if (role === "applicant") router.replace("/applicant");
+          else if (role === "manager") router.replace("/manager");
+          else if (role === "reviewer") router.replace("/reviewer");
+          else if (role === "admin") router.replace("/admin");
+          else router.replace(redirect);
+        } else {
+          console.log("No role found, redirecting to:", redirect);
+          router.replace(redirect);
+        }
+      }
+    } catch (error) {
+      console.error("Login exception:", error);
+      setLoginError("An unexpected error occurred");
+      setToastMessage("An unexpected error occurred");
       setToastType("error");
-      return;
-    }
-
-    const newSession = await getSession();
-    const accessToken = (newSession as any)?.access;
-
-    if (accessToken) {
-      sessionStorage.setItem("access_token", accessToken);
-    }
-
-    if (newSession?.user?.role) {
-      const role = newSession.user.role;
-      if (role === "applicant") router.replace("/applicant");
-      else if (role === "manager") router.replace("/manager");
-      else if (role === "reviewer") router.replace("/reviewer");
-      else if (role === "admin") router.replace("/admin");
-      else router.replace(redirect);
-    } else {
-      router.replace(redirect);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,8 +126,9 @@ export const useAuth = () => {
     } catch (err: any) {
       setToastMessage(err?.data?.message || "Failed to send reset link");
       setToastType("error");
-    }finally {
-    setLoading(false);}
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetPassword = async (token: string, newPassword: string) => {
@@ -122,8 +144,9 @@ export const useAuth = () => {
         success: false,
         error: err?.data?.message || "Failed to reset password",
       };
-    }finally {
-    setLoading(false);}
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -134,7 +157,7 @@ export const useAuth = () => {
     if (session?.error === "RefreshAccessTokenError") {
       setToastMessage("Your session expired. Please log in again.");
       setToastType("error");
-      sessionStorage.removeItem("access_token"); // clear token on error
+      sessionStorage.removeItem("access_token");
       logout();
     }
   }, [session]);

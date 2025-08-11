@@ -7,9 +7,10 @@ import {
   mapApiToReviewDetail,
   ReviewDetail,
 } from "../../../../lib/redux/types/detailData";
-import ReviewerDetailPage from "../page";
+import ReviewerDetailComponent from "../../../components/ReviewerDetailComponent";
+import SuspenseWrapper from "../../../components/SuspenseWrapper";
 
-const ReviewDetailsPage = () => {
+function ReviewDetailsContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { data: session, status: sessionStatus } = useSession();
@@ -52,7 +53,7 @@ const ReviewDetailsPage = () => {
   }, [application_id, session, sessionStatus]);
 
   return (
-    <ReviewerDetailPage
+    <ReviewerDetailComponent
       reviewDetail={reviewDetail}
       reviewerName={reviewerName}
       isLoading={isLoading}
@@ -60,6 +61,14 @@ const ReviewDetailsPage = () => {
       readonly={readonly}
       reviewStatus={status}
     />
+  );
+}
+
+const ReviewDetailsPage = () => {
+  return (
+    <SuspenseWrapper>
+      <ReviewDetailsContent />
+    </SuspenseWrapper>
   );
 };
 

@@ -11,8 +11,9 @@ import HeaderAuth from "@/app/components/HeaderAuth";
 import Toaster from "@/app/components/Toaster";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import SuspenseWrapper from "@/app/components/SuspenseWrapper";
 
-const SignIn = () => {
+const SignInContent = () => {
   type FormData = {
     password: string;
     email: string;
@@ -99,73 +100,55 @@ const SignIn = () => {
               {errors.email && (
                 <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="relative w-full">
+              <div className="relative">
                 <InputField
                   isLast={true}
                   type={showCurrentPassword ? "text" : "password"}
-                  placeholder="password123"
+                  placeholder="Password"
                   {...register("password", {
                     required: "Password is required",
                   })}
-                  className="pr-10" // Add padding so text doesn't overlap icon
                 />
-
-                {/* Password toggle button inside input */}
                 <button
                   type="button"
-                  onClick={() => setShowCurrentPassword((v) => !v)}
-                  aria-label={
-                    showCurrentPassword ? "Hide password" : "Show password"
-                  }
-                  className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
                 >
                   {showCurrentPassword ? (
-                    <EyeOff className="h-5 w-5" />
+                    <EyeOff className="h-4 w-4 text-gray-500" />
                   ) : (
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-4 w-4 text-gray-500" />
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs">{errors.password.message}</p>
+              )}
             </div>
           </div>
-          {errors.password && (
-            <p className="text-red-500 text-xs">{errors.password.message}</p>
-          )}
-
-          <div className="w-full mb-[25px] flex justify-between items-center text-sm mt-[25px] text-[#111827]">
-            <label>
-              <input
-                type="checkbox"
-                className="mr-1"
-                {...register("rememberMe")}
-              />
-              Remember me
-            </label>
-            <a
-              href="/auth/forgot-password"
-              className="text-[#4F46E5] hover:underline font-[500]"
-            >
-              Forgot your password?
-            </a>
-          </div>
-
           <Button
-            text={loading ? "Signing in..." : "Sign In"}
+            text={loading ? "Signing in..." : "Sign in"}
+            type="submit"
             disabled={loading}
           />
         </form>
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          show={toast.show}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       </AuthLayout>
       <Footer />
-
-      <Toaster
-        message={toast.message}
-        type={toast.type}
-        show={toast.show}
-        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-      />
     </div>
+  );
+};
+
+const SignIn = () => {
+  return (
+    <SuspenseWrapper>
+      <SignInContent />
+    </SuspenseWrapper>
   );
 };
 
