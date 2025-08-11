@@ -10,6 +10,7 @@ import Footer from "@/app/components/Footer";
 import HeaderAuth from "@/app/components/HeaderAuth";
 import Toaster from "@/app/components/Toaster";
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const SignIn = () => {
   type FormData = {
@@ -20,7 +21,7 @@ const SignIn = () => {
   };
 
   const { login, loading, toastMessage, toastType, clearToast } = useAuth();
-
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -100,12 +101,33 @@ const SignIn = () => {
               )}
             </div>
             <div className="flex flex-col gap-1">
-              <InputField
-                isLast={true}
-                type="password"
-                placeholder="password123"
-                {...register("password", { required: "Password is required" })}
-              />
+              <div className="relative w-full">
+                <InputField
+                  isLast={true}
+                  type={showCurrentPassword ? "text" : "password"}
+                  placeholder="password123"
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                  className="pr-10" // Add padding so text doesn't overlap icon
+                />
+
+                {/* Password toggle button inside input */}
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword((v) => !v)}
+                  aria-label={
+                    showCurrentPassword ? "Hide password" : "Show password"
+                  }
+                  className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           {errors.password && (
