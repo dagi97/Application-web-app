@@ -1,5 +1,3 @@
-// next-auth handler (e.g., app/api/auth/[...nextauth]/route.ts or route.js)
-
 import NextAuth, { AuthOptions, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -16,7 +14,10 @@ interface MyToken extends JWT {
   role?: string;
   email?: string;
   error?: string | null;
+  accessTokenExpires?: number;
 }
+
+const TOKEN_LIFETIME = 15 * 60 * 1000;
 
 async function refreshAccessToken(token: MyToken): Promise<MyToken> {
   console.log("Refreshing token with refresh:", token.refresh);
@@ -48,7 +49,8 @@ async function refreshAccessToken(token: MyToken): Promise<MyToken> {
 
     return {
       ...token,
-      access: data.data.access,
+      access: data.access,
+      accessTokenExpires: Date.now() + TOKEN_LIFETIME,
       error: null,
     };
   } catch (error) {
@@ -106,7 +108,6 @@ export const authOptions: AuthOptions = {
 
   callbacks: {
     async jwt({ token, user }) {
-      // On initial sign in
       if (user) {
         console.log("Storing tokens on sign in:", user.access, user.refresh);
         return {
@@ -116,19 +117,23 @@ export const authOptions: AuthOptions = {
           role: user.role,
           email: user.email,
           name: user.name,
+          accessTokenExpires: Date.now() + TOKEN_LIFETIME,
           error: null,
         };
       }
 
-      // On subsequent calls, try refresh once
-      console.log("Refreshing with token:", token.refresh);
-
-      // If refresh failed before, don't retry infinitely
-      if (token.error === "RefreshAccessTokenError") {
-        return { ...token };
+      // Return previous token if the access token has not expired yet
+      if (token.accessTokenExpires && Date.now() < token.accessTokenExpires) {
+        return token;
       }
 
-      // Attempt refresh
+      // Access token expired, try to refresh it
+      if (token.error === "RefreshAccessTokenError") {
+        // If refresh failed before, don't retry endlessly
+        return token;
+      }
+
+      // Refresh access token
       return await refreshAccessToken(token as MyToken);
     },
 

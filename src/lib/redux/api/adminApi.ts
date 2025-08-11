@@ -187,7 +187,7 @@ export const adminApi = createApi({
     updateCycle: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `/admin/cycles/${id}`,
-        method: "PUT",
+        method: "PUT",  //changed the method from patch to put 
         body: data,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Cycle", id }],
