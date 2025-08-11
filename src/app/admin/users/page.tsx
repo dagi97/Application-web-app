@@ -17,7 +17,6 @@ import LoadingSpinner from "@/app/components/LoadingSpinner";
 const Page = () => {
   const dispatch = useDispatch();
   const { searchText, role, currentPage } = useSelector((state: RootState) => state.filter);
-
   const isSearchActive = searchText.trim().length > 0;
   
   const {
@@ -75,11 +74,9 @@ const Page = () => {
 
       const total = paginatedData?.total_count ?? 0; 
       const pages = Math.ceil(total / limit);
-
       
       return { usersToDisplay: roleFilteredUsers, totalPages: pages, totalResults: total };
     }
-
   }, [isSearchActive, paginatedData, allUsersData, searchText, role, currentPage]);
 
 
@@ -107,7 +104,7 @@ const Page = () => {
 
     if (isApiError) {
       return (
-        <div className="text-center p-8 text-red-500">
+        <div className="text-center p-8 text-red-500 bg-white rounded-lg shadow">
           Error fetching data. Please try again later.
         </div>
       );
@@ -131,15 +128,14 @@ const Page = () => {
     <div className="bg-[#F3F4F6] min-h-screen flex flex-col">
       <AdminNav />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
-        {/* ... Header and SearchBar ... */}
-         <div className="flex justify-between items-center mb-7">
+         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-7">
           <div>
-            <h1 className="text-[#111827] text-3xl font-bold">User Management</h1>
-            <p className="text-[#4B5563] font-normal">
+            <h1 className="text-[#111827] text-2xl sm:text-3xl font-bold">User Management</h1>
+            <p className="text-[#4B5563] font-normal mt-1">
               Administer and manage all users on the platform.
             </p>
           </div>
-          <div>
+          <div className="self-start sm:self-auto">
             <Link href="/admin/users/create_user">
               <Button size="admin">
                 <p className="whitespace-nowrap">Create New User</p>
@@ -159,9 +155,8 @@ const Page = () => {
 
         <div className="mb-7">{renderContent()}</div>
 
-        {/* This condition will now work correctly! */}
         {totalPages > 1 && !isLoading && (
-          <div className="mb-56"> 
+          <div className="mb-16 lg:mb-56"> 
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

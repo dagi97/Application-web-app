@@ -91,6 +91,7 @@ const ForgotPassword = () => {
         </Link>
       </AuthLayout>
       <Footer />
+ 
 
       <Toaster
         message={toast.message}
@@ -98,6 +99,7 @@ const ForgotPassword = () => {
         show={toast.show}
         onClose={() => setToast((prev) => ({ ...prev, show: false }))}
       />
+ 
     </div>
   );
 };
