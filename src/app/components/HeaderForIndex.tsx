@@ -17,13 +17,7 @@ const HeaderForIndex = () => {
               rel="noopener noreferrer"
               className="cursor-pointer"
             >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
+              <img src={"/a2sv-logo.svg"} />
             </a>
           </div>
 
@@ -47,9 +41,17 @@ const HeaderForIndex = () => {
             >
               Testimonials
             </a>
-            <Link href="/auth/signin">
+            <Link href="/auth/register">
               <button className="text-white bg-[#4338CA] px-4 py-2 rounded-md mt-2 font-medium mb-2">
                 Apply Now
+              </button>
+            </Link>
+            <Link href="/auth/signin">
+              <button
+                className="text-white bg-[#4338CA] px-8 py-2 rounded-md mt-2 font-medium mb-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
               </button>
             </Link>
           </div>
@@ -106,15 +108,20 @@ const HeaderForIndex = () => {
             >
               Testimonials
             </a>
-            <Link href="/auth/signin">
-
-              <button
-                className="w-[150px] text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Apply Now
-              </button>
-            </Link>
+            <a
+              href="/auth/register"
+              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Apply Now
+            </a>
+            <a
+              href="/auth/signin"
+              className="block py-2 border-b border-gray-100 text-[#6B7280] hover:text-[#829FAB]"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </a>
           </div>
         </div>
       )}
