@@ -220,12 +220,15 @@ const TimeLineCard = () => {
                             setIsDeleting(true);
                             deleteApplication(application.data.id)
                               .unwrap()
-                              .then(() =>
+                              .then(() => {
                                 showToast(
                                   "success",
                                   "Application deleted successfully"
-                                )
-                              )
+                                );
+                                setTimeout(() => {
+                                  window.location.reload();
+                                }, 1500);
+                              })
                               .catch(() =>
                                 showToast("error", "Error deleting application")
                               )
@@ -250,12 +253,16 @@ const TimeLineCard = () => {
                             setIsSubmitting(true);
                             submitApplication(application.data.id)
                               .unwrap()
-                              .then(() =>
+                              .then(() => {
                                 showToast(
                                   "success",
                                   "Application submitted successfully"
-                                )
-                              )
+                                );
+
+                                setTimeout(() => {
+                                  window.location.reload();
+                                }, 1500);
+                              })
                               .catch(() =>
                                 showToast(
                                   "error",
