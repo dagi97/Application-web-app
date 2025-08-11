@@ -419,7 +419,7 @@ const ReviewerDetailPage: React.FC<ReviewerDetailPageProps> = ({
       </main>
       <div className="bg-[#1F2937] max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center min-w-screen">
         <p className="text-sm text-white">
-          &copy; 2025 A2SV. All rights reserved.
+          &copy; {new Date().getFullYear()} A2SV. All rights reserved.
         </p>
       </div>
     </div>
