@@ -78,15 +78,15 @@ const AllApplications = ({ applications, reviewers, onAssignReviewer }: any) => 
             <div className='px-6 py-4 border-b border-gray-200'>
                 <h2 className='text-lg font-semibold text-gray-900'>All Applications</h2>
             </div>
-            <div className='overflow-x-auto'>
-                <table className="w-full text-left">
+            <div className='overflow-visible'>
+                <table className="w-full text-left table-auto">
                     <thead className='bg-gray-50'>
                         <tr>
-                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>APPLICANT</th>
-                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>SUBMITTED</th>
-                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>ASSIGNED REVIEWER</th>
-                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>STATUS</th>
-                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>ACTIONS</th>
+                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]'>APPLICANT</th>
+                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]'>SUBMITTED</th>
+                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]'>ASSIGNED REVIEWER</th>
+                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[120px]'>STATUS</th>
+                            <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]'>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-200'>

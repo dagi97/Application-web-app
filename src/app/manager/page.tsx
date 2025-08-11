@@ -1,135 +1,122 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import AllApplications from "@/app/components/AllApplications";
-import HeaderManagerDetail from "@/app/components/HeaderManagerDetail";
+import Header from "../components/ManagerHeader";
 import StatCard from "@/app/components/StatCard";
 import TeamPerformance from "@/app/components/TeamPerformance";
 import Footer from "@/app/components/Footer";
-import {
-    useAssignReviewerMutation,
-    useGetAllReviewersQuery
-} from "@/lib/redux/api/managerApi";
+import LoadingSpinner from "@/app/components/LoadingSpinner";
 
 export default function DashboardPage() {
-    const [applications, setApplications] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    // Mock data for testing display
+    const [applications, setApplications] = useState<any[]>([
+        {
+            id: "8a610aca-a223-43a1-9c56-d9803a5e7999",
+            applicant_name: "Abebe Kebede",
+            status: "in_progress",
+            assigned_reviewer_name: "Abebeche Kebede",
+            submitted_at: "2025-07-25T23:14:36.257313+03:00"
+        },
+        {
+            id: "382db91c-270b-493f-902f-5f33694a4c2f",
+            applicant_name: "Full Name",
+            status: "pending_review",
+            assigned_reviewer_name: null,
+            submitted_at: "2025-07-29T16:15:07.600010+03:00"
+        },
+        {
+            id: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+            applicant_name: "Sarah Johnson",
+            status: "accepted",
+            assigned_reviewer_name: "John Doe",
+            submitted_at: "2025-07-20T10:30:00.000000+03:00"
+        },
+        {
+            id: "b2c3d4e5-f6a7-8901-2345-678901bcdef",
+            applicant_name: "Michael Chen",
+            status: "rejected",
+            assigned_reviewer_name: "Jane Smith",
+            submitted_at: "2025-07-18T14:45:00.000000+03:00"
+        },
+        {
+            id: "c3d4e5f6-a7b8-9012-3456-789012cdefa",
+            applicant_name: "Emily Rodriguez",
+            status: "in_progress",
+            assigned_reviewer_name: "Mike Wilson",
+            submitted_at: "2025-07-22T09:15:00.000000+03:00"
+        }
+    ]);
+
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const { data: session, status } = useSession();
-
-    // Initialize Redux API hooks
-    const [assignReviewer] = useAssignReviewerMutation();
-    const { data: reviewersData, isLoading: reviewersLoading, error: reviewersError } = useGetAllReviewersQuery();
-
-    // Helper to get access token from NextAuth session (matching managerApi pattern)
-    const getAccessToken = async () => {
-        if (typeof window === "undefined") return null;
-
-        // Try to get NextAuth session first
-        const response = await fetch("/api/auth/session");
-        const session = await response.json();
-
-        return session?.access || null;
-    };
-
-    // GET /manager/applications/ - List Applications with full details
-    const fetchApplications = async () => {
-        try {
-            const token = await getAccessToken();
-
-            if (!token) {
-                setError("No access token found. Please sign in again.");
-                setLoading(false);
-                return;
-            }
-
-            const response = await fetch("https://a2sv-application-platform-backend-team2.onrender.com/manager/applications/", {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Manager API Response:", data);
-
-            if (data.success && data.data) {
-                const basicApplications = data.data.applications || [];
-                console.log("Basic applications from manager API:", basicApplications);
-
-                // Check if the manager API already includes the fields we need
-                const firstApp = basicApplications[0];
-                console.log("First application structure:", firstApp);
-                console.log("Available fields in manager API:", Object.keys(firstApp || {}));
-
-                // Try to fetch full details for each application, but handle 403 errors gracefully
-                const applicationsWithDetails = await Promise.all(
-                    basicApplications.map(async (app: any) => {
-                        try {
-                            const detailResponse = await fetch(`https://a2sv-application-platform-backend-team2.onrender.com/applications/${app.id}`, {
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token}`,
-                                },
-                            });
-
-                            if (detailResponse.ok) {
-                                const detailData = await detailResponse.json();
-                                console.log(`Detail API Response for app ${app.id}:`, detailData);
-                                if (detailData.success && detailData.data) {
-                                    // Merge the basic app data with the detailed data
-                                    const mergedApp = {
-                                        ...app,
-                                        ...detailData.data,
-                                        applicant_name: app.applicant_name || detailData.data.applicant_name || "Unknown",
-                                        submitted_at: app.submitted_at || detailData.data.submitted_at || detailData.data.created_at || detailData.data.updated_at,
-                                        assigned_reviewer_name: app.assigned_reviewer_name || app.reviewer_name || detailData.data.assigned_reviewer_name || detailData.data.reviewer_name || "Not Assigned"
-                                    };
-                                    console.log(`Merged app ${app.id}:`, mergedApp);
-                                    return mergedApp;
-                                }
-                            } else {
-                                console.log(`Detail API failed for app ${app.id} with status: ${detailResponse.status}`);
-                            }
-                        } catch (err) {
-                            console.error(`Failed to fetch details for application ${app.id}:`, err);
-                        }
-
-                        // Return basic app data if detail fetch fails - use available fields
-                        return {
-                            ...app,
-                            applicant_name: app.applicant_name || app.applicant?.name || "Unknown",
-                            submitted_at: app.submitted_at || app.created_at || app.updated_at || app.application_date || app.submission_date,
-                            assigned_reviewer_name: app.assigned_reviewer_name || app.reviewer_name || app.reviewer?.name || "Not Assigned"
-                        };
-                    })
-                );
-
-                console.log("Final applications with details:", applicationsWithDetails);
-                setApplications(applicationsWithDetails);
-            }
-        } catch (err) {
-            console.error("Failed to fetch applications:", err);
-            setError(err instanceof Error ? err.message : "Unknown error");
-        } finally {
-            setLoading(false);
+    // Mock reviewers data
+    const reviewers = [
+        {
+            id: "223277f0-af11-44c5-843e-23afcb194ea8",
+            name: "John Doe",
+            email: "john@example.com",
+            full_name: "John Doe"
+        },
+        {
+            id: "334388g1-bg22-55c6-9544-34bgdc205fb9",
+            name: "Jane Smith",
+            email: "jane@example.com",
+            full_name: "Jane Smith"
+        },
+        {
+            id: "445499h2-ch33-66d7-1655-45ched306gc0",
+            name: "Mike Wilson",
+            email: "mike@example.com",
+            full_name: "Mike Wilson"
+        },
+        {
+            id: "5566aa3-di44-77e8-2766-56dfe407hd1",
+            name: "Abebeche Kebede",
+            email: "abebeche@example.com",
+            full_name: "Abebeche Kebede"
         }
-    };
+    ];
 
-    // PATCH /manager/applications/{application_id}/assign/ - Assign Reviewer
-    const handleAssignReviewer = async (applicationId: string, reviewerId: string) => {
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    // Redirect if not authenticated or not a manager
+    useEffect(() => {
+        if (status === "loading") return;
+
+        if (!session) {
+            router.push("/auth/signin");
+            return;
+        }
+
+        if ((session.user as any)?.role !== "manager") {
+            router.push("/unauthorized");
+            return;
+        }
+    }, [session, status, router]);
+
+    // Mock assign reviewer function
+    const handleAssignReviewer = async (
+        applicationId: string,
+        reviewerId: string
+    ) => {
         try {
-            await assignReviewer({ appId: applicationId, reviewer_id: reviewerId }).unwrap();
-            setSuccessMessage("Reviewer assigned successfully!");
+            // Find the reviewer
+            const reviewer = reviewers.find(r => r.id === reviewerId);
+            const reviewerName = reviewer ? reviewer.full_name || reviewer.name : "Unknown";
 
-            // Refresh applications to show updated assignment
-            await fetchApplications();
+            // Update the application with the assigned reviewer
+            setApplications(prev => prev.map(app =>
+                app.id === applicationId
+                    ? { ...app, assigned_reviewer_name: reviewerName }
+                    : app
+            ));
+
+            setSuccessMessage(`Reviewer ${reviewerName} assigned successfully!`);
 
             // Clear success message after 3 seconds
             setTimeout(() => setSuccessMessage(null), 3000);
@@ -142,95 +129,81 @@ export default function DashboardPage() {
         }
     };
 
+    const isLoading = loading || status === "loading";
 
-    useEffect(() => {
-        const initializeApplications = async () => {
-            try {
-                const token = await getAccessToken();
-
-                if (token) {
-                    await fetchApplications();
-                } else {
-                    setLoading(false);
-                }
-            } catch (error) {
-                console.error("Failed to initialize applications:", error);
-                setLoading(false);
-            }
-        };
-
-        initializeApplications();
-
-        // Failsafe: Ensure loading doesn't stay true forever
-        const timeout = setTimeout(() => {
-            setLoading(false);
-        }, 10000); // 10 second timeout
-
-        return () => clearTimeout(timeout);
-    }, []); // Only run once on mount, following reviewer page pattern
-
-    const isLoading = loading || reviewersLoading;
-
-    if (isLoading) {
+    // Loading state
+    if (status === "loading" || !session) {
         return (
             <>
-                <HeaderManagerDetail managerName={session?.user?.email || "Manager"} />
-                <div className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
-                    <div className="flex items-center justify-center h-64">
-                        <div className="text-lg">Loading...</div>
+                <Header />
+                <main className="flex-1 mt-[42px] bg-gray-50 overflow-hidden">
+                    <div className="pt-10 px-[100px] overflow-x-hidden">
+                        <div className="flex items-center justify-center h-64">
+                            <div className="text-lg">Loading...</div>
+                        </div>
                     </div>
+                </main>
+                <div className="w-full">
+                    <Footer />
                 </div>
-                <Footer />
             </>
         );
     }
 
+    // Error state
     if (error) {
         return (
             <>
-                <HeaderManagerDetail managerName={session?.user?.email || "Manager"} />
-                <div className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
-                    <div className="flex items-center justify-center h-64">
-                        <div className="text-lg text-red-600">Error: {error}</div>
+                <Header />
+                <main className="flex-1 mt-[42px] bg-gray-50 overflow-hidden">
+                    <div className="pt-10 px-[100px] overflow-x-hidden">
+                        <div className="flex items-center justify-center h-64">
+                            <div className="text-lg text-red-600">Error: {error}</div>
+                        </div>
                     </div>
+                </main>
+                <div className="w-full">
+                    <Footer />
                 </div>
-                <Footer />
             </>
         );
     }
 
-    const reviewers = reviewersData?.data?.reviewers || [];
-
+    // Main content state
     return (
         <>
-            <HeaderManagerDetail managerName={session?.user?.email || "Manager"} />
+            <Header />
 
             {successMessage && (
-                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative ml-[159px] mt-4 mr-4">
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4 mr-4">
                     <strong className="font-bold">Success!</strong>
                     <span className="block sm:inline"> {successMessage}</span>
                 </div>
             )}
 
-            <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
-                <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
-                    <StatCard title="Total Applications" count={applications.length || 0} />
-                    <StatCard title="Under Review" count={applications.filter((app: any) => app.status === "pending_review").length || 0} />
-                    <StatCard title="In Progress" count={applications.filter((app: any) => app.status === "in_progress").length || 0} />
-                    <StatCard title="Accepted" count={applications.filter((app: any) => app.status === "accepted").length || 0} />
-                </div>
+            <main className="flex-1 mt-[42px] bg-gray-50 overflow-hidden">
+                <div className="pt-10 px-[100px] overflow-x-hidden">
+                    <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+                        <StatCard title="Total Applications" count={applications.length || 0} />
+                        <StatCard title="Under Review" count={applications.filter((app: any) => app.status === "pending_review").length || 0} />
+                        <StatCard title="In Progress" count={applications.filter((app: any) => app.status === "in_progress").length || 0} />
+                        <StatCard title="Accepted" count={applications.filter((app: any) => app.status === "accepted").length || 0} />
+                    </div>
 
-                <div className="space-y-8">
-                    <AllApplications
-                        applications={applications}
-                        reviewers={reviewers}
-                        onAssignReviewer={handleAssignReviewer}
-                    />
-                    <TeamPerformance teamMembers={reviewers} applications={applications} />
+                    <div className="space-y-8 pb-20">
+                        <AllApplications
+                            applications={applications}
+                            reviewers={reviewers}
+                            onAssignReviewer={handleAssignReviewer}
+                        />
+                        <TeamPerformance teamMembers={reviewers} applications={applications} />
+                    </div>
                 </div>
             </main>
 
-            <Footer />
+            <div className="w-full">
+                <Footer />
+            </div>
         </>
     );
 }
