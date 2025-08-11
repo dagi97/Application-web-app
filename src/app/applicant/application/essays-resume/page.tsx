@@ -249,7 +249,7 @@ export default function EssaysResumeStep() {
               className="bg-[#5f3dc4] hover:bg-[#5032ad] text-white px-6 py-2 rounded-md"
               disabled={isLoading}
             >
-              {isLoading ? "Submitting..." : "Submit"}
+              {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>
