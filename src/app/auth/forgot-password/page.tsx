@@ -26,7 +26,7 @@ const ForgotPassword = () => {
   };
   return (
     <div className="bg-[#F9FAFB]">
-      <HeaderForIndex/>
+      <HeaderForIndex />
       <AuthLayout>
         <AuthHeader
           title="Forgot your password?"
@@ -63,7 +63,7 @@ const ForgotPassword = () => {
           Back to login
         </Link>
       </AuthLayout>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

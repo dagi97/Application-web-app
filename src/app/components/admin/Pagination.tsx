@@ -28,7 +28,6 @@ interface PaginationProps {
 
 const Pagination = ({ currentPage, totalPages, totalResults, limit, onPageChange }: PaginationProps) => {
     const pageNumbers = generatePageNumbers(currentPage, totalPages);
-
     const startItem = (currentPage - 1) * limit + 1;
     const endItem = Math.min(currentPage * limit, totalResults);
     
@@ -37,7 +36,7 @@ const Pagination = ({ currentPage, totalPages, totalResults, limit, onPageChange
     }
 
     return (
-        <div className="flex items-center justify-between py-4">
+        <div className="flex flex-col items-center gap-4 py-4 sm:flex-row sm:justify-between">
             <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of <span className="font-medium">{totalResults}</span> results
             </p>
@@ -56,7 +55,6 @@ const Pagination = ({ currentPage, totalPages, totalResults, limit, onPageChange
                         return <span key={`ellipsis-${index}`} className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300">...</span>;
                     }
 
-                    
                     return (
                         <button
                             key={page}

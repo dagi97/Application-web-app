@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useCreateUserMutation } from "@/lib/redux/api/adminApi";
 import { useRouter } from "next/navigation";
-import Toaster from "../Toaster"; // adjust path if needed
+import Toaster from "../Toaster";
 
 interface IFormInput {
   full_name: string;
@@ -25,7 +25,6 @@ const CreateUserForm = () => {
     defaultValues: { role: "applicant" },
   });
 
-  // Toaster state
   const [toast, setToast] = useState({
     message: "",
     type: "success" as "success" | "error",
@@ -62,7 +61,7 @@ const CreateUserForm = () => {
         onClose={() => setToast((prev) => ({ ...prev, show: false }))}
       />
 
-      <div className="bg-white p-8 rounded-lg shadow-md w-full mx-auto">
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-full mx-auto">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div>
@@ -113,7 +112,6 @@ const CreateUserForm = () => {
               )}
             </div>
 
-
             <div>
               <label
                 htmlFor="password"
@@ -160,18 +158,18 @@ const CreateUserForm = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 mt-8">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4 mt-8">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
             >
               {isLoading ? "Saving..." : "Save User"}
             </button>

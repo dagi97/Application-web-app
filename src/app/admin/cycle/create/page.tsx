@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 <<<<<<< HEAD
 import Footer_Variant1 from "@/app/components/footer/footer_variant1";
 =======
+<<<<<<< HEAD
+import Footer_Variant1 from "@/app/components/footer/footer_variant1";
+=======
 >>>>>>> 80653f1953c19ab44e716ba49223276328c9d88e
+>>>>>>> 04d76a744c2de6174414f7f249d8c53dc3dea11e
 
 type FormValue = {
   cycle_name: string;
@@ -81,6 +85,10 @@ export default function CreateCycle() {
   };
 
   return (
+<<<<<<< HEAD
+    <>
+      {" "}
+=======
 <<<<<<< HEAD
     <>
       {" "}
@@ -189,14 +197,112 @@ export default function CreateCycle() {
               </div>
 =======
     <div className="w-full max-w-[1920px] p-4 md:p-10">
+>>>>>>> 04d76a744c2de6174414f7f249d8c53dc3dea11e
       <AdminNav />
-      <div className="flex flex-col gap-2 mb-6 md:mb-10">
-        <h1 className="text-xl md:text-2xl font-bold">Create new cycle</h1>
-        <p className="text-sm md:text-base text-gray-600">
-          Use this form to create a new cycle and assign periods.
-        </p>
-      </div>
+      <div className="w-full max-w-[1920px] p-4 md:p-10">
+        <div className="flex flex-col gap-2 mb-6 md:mb-10">
+          <h1 className="text-xl md:text-2xl font-bold">Create new cycle</h1>
+          <p className="text-sm md:text-base text-gray-600">
+            Use this form to create a new cycle and assign periods.
+          </p>
+        </div>
 
+<<<<<<< HEAD
+        <div className="w-full max-w-[1216px] p-4 md:p-6 rounded-lg bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.1)]">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Cycle name
+                </label>
+                <input
+                  type="text"
+                  className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
+                    errors.cycle_name ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  {...register("cycle_name", {
+                    required: "Cycle name is required",
+                  })}
+                  placeholder="Enter cycle name"
+                />
+                {errors.cycle_name && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.cycle_name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Country
+                </label>
+                <select
+                  className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
+                    errors.country ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  {...register("country", { required: "Country is required" })}
+                >
+                  <option value="" disabled>
+                    Select a country
+                  </option>
+                  <option value="ethiopia">Ethiopia</option>
+                  <option value="kenya">Kenya</option>
+                  <option value="nigeria">Nigeria</option>
+                  <option value="ghana">Ghana</option>
+                </select>
+                {errors.country && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.country.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Start date
+                </label>
+                <input
+                  type="date"
+                  className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
+                    errors.start_date ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  {...register("start_date", {
+                    required: "Start date is required",
+                  })}
+                />
+                {errors.start_date && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.start_date.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  End date
+                </label>
+                <input
+                  type="date"
+                  className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
+                    errors.end_date ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
+                  {...register("end_date", {
+                    required: "End date is required",
+                    validate: (value, { start_date }) => {
+                      if (start_date && value <= start_date) {
+                        return "End date must be after start date";
+                      }
+                      return true;
+                    },
+                  })}
+                />
+                {errors.end_date && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.end_date.message}
+                  </p>
+                )}
+              </div>
+=======
       <div className="w-full max-w-[1216px] p-4 md:p-6 rounded-lg bg-white shadow-[0_1px_3px_0_rgba(0,0,0,0.1)]">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
@@ -220,6 +326,7 @@ export default function CreateCycle() {
                 </p>
               )}
 >>>>>>> 80653f1953c19ab44e716ba49223276328c9d88e
+>>>>>>> 04d76a744c2de6174414f7f249d8c53dc3dea11e
             </div>
 
             {/* Error Message */}
@@ -249,6 +356,9 @@ export default function CreateCycle() {
                 }}
               >
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 04d76a744c2de6174414f7f249d8c53dc3dea11e
                 Cancel
               </button>
               <button
@@ -258,6 +368,11 @@ export default function CreateCycle() {
               >
                 {isLoading ? "Saving..." : "Save Cycle"}
               </button>
+<<<<<<< HEAD
+            </div>
+          </form>
+        </div>
+=======
             </div>
           </form>
         </div>
@@ -360,6 +475,7 @@ export default function CreateCycle() {
           </div>
         </form>
 >>>>>>> 80653f1953c19ab44e716ba49223276328c9d88e
+>>>>>>> 04d76a744c2de6174414f7f249d8c53dc3dea11e
       </div>
       <Footer_Variant1 />
     </>
