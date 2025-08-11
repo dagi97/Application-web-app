@@ -7,8 +7,8 @@ import {
   useGetUserByIdQuery,
 } from "@/lib/redux/api/adminApi";
 import { useRouter } from "next/navigation";
-import { User } from "@/types/admin/User";
 import Toaster from "../Toaster";
+import LoadingSpinner from "../LoadingSpinner";
 
 interface IFormInput {
   full_name: string;
@@ -64,7 +64,6 @@ const EditUserForm = ({ userId }: EditUserFormProps) => {
     formState: { errors },
   } = useForm<IFormInput>();
 
-  // Toaster state
   const [toast, setToast] = useState({
     message: "",
     type: "success" as "success" | "error",
@@ -113,11 +112,10 @@ const EditUserForm = ({ userId }: EditUserFormProps) => {
     }
   };
 
-  if (isUserLoading)
-    return <div className="text-center p-8">Loading user data...</div>;
+  if (isUserLoading) return <LoadingSpinner />;
   if (isError)
     return (
-      <div className="text-center p-8 text-red-500">
+      <div className="text-center p-8 text-red-500 bg-white rounded-lg shadow-md">
         Failed to load user data.
       </div>
     );
@@ -131,8 +129,7 @@ const EditUserForm = ({ userId }: EditUserFormProps) => {
         onClose={() => setToast((prev) => ({ ...prev, show: false }))}
       />
 
-
-      <div className="bg-white p-8 rounded-lg shadow-md w-full mx-auto">
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-md w-full mx-auto">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div>
@@ -236,23 +233,22 @@ const EditUserForm = ({ userId }: EditUserFormProps) => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="true">Active</option>
-
                 <option value="false">Inactive</option>
               </select>
             </div>
           </div>
-          <div className="flex justify-end gap-4 mt-8">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4 mt-8">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isUpdating}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
             >
               {isUpdating ? "Updating..." : "Update User"}
             </button>
