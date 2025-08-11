@@ -5,6 +5,7 @@ import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice"
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import ApplicationCard from "../components/ApplicationCard";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 import Header from "../components/Header";
 import {
   fetchReviewerProfile,
@@ -12,11 +13,15 @@ import {
 } from "../../lib/redux/utils/login";
 
 export default function ReviewerDashboard() {
+  const { data: session } = useSession();
+  const { data: profileData } = useGetProfileQuery();
   const [leftHovered, setLeftHovered] = useState(false);
   const [rightHovered, setRightHovered] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "underReview" | "complete"
   >("all");
+  const [sortBy, setSortBy] = useState("date");
+  const reviewerName = profileData?.data.full_name || "Reviewer";
 
   useEffect(() => {
     setCurrentPage(1);
@@ -24,27 +29,15 @@ export default function ReviewerDashboard() {
       setApplications(data.data.reviews);
     }
   }, [selectedFilter]);
-  const [sortBy, setSortBy] = useState("date");
-  const { data: session } = useSession();
-  const reviewerName =
-    (session?.user && "name" in session.user
-      ? (session.user as { name?: string }).name
-      : undefined) ||
-    session?.user?.email ||
-    "Reviewer";
-
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
-    if (token) {
-      fetchReviewerProfile(token).then((profile) => {
+    const accessToken = (session as any)?.access;
+    if (accessToken) {
+      fetchReviewerProfile(accessToken).then((profile) => {
         if (profile) {
         }
       });
     }
-  }, []);
+  }, [session]);
 
   const { data, isLoading, isError } = useGetAssignedReviewsQuery({
     page: 1,
@@ -63,23 +56,23 @@ export default function ReviewerDashboard() {
   }, [data]);
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("access_token")
-        : null;
+    const accessToken = (session as any)?.access;
     async function fetchAllReviewDetails() {
-      if (!token || applications.length === 0) return;
+      if (!accessToken || applications.length === 0) return;
       const detailsMap: Record<string, any> = {};
       await Promise.all(
         applications.map(async (app) => {
-          const detail = await fetchReviewDetails(app.application_id, token);
+          const detail = await fetchReviewDetails(
+            app.application_id,
+            accessToken
+          );
           detailsMap[app.application_id] = detail;
         })
       );
       setReviewDetailsMap(detailsMap);
     }
     fetchAllReviewDetails();
-  }, [applications]);
+  }, [applications, session]);
 
   // Temp solution until i figure out how to change the status on the backend, this is just for local state management
   const handleStatusChange = (applicationId: string, newStatus: string) => {
@@ -284,11 +277,10 @@ export default function ReviewerDashboard() {
         </div>
       </main>
 
-      <footer className="bg-[#1F2937] mt-12 sticky bottom-0 w-full">
-        <div className="max-w-7xl mx-auto pb-10 pt-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-          <hr className="text-gray-600 w-full mb-3" />
-          <p className="text-sm text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} A2SV. All rights reserved.
+      <footer className="bg-gray-800 text-white py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-400">
+            © {new Date().getFullYear()} A2SV. All rights reserved.
           </p>
         </div>
       </footer>

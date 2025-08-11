@@ -1,15 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { refreshSession } from "../lib/refreshSession";
 import { useEffect, useState } from "react";
 import {
   useGetProfileQuery,
   useUpdateProfileMutation,
 } from "../../lib/redux/api/ProfileApiSlice";
-import {
-  loginAndStoreToken,
-  updatePassword,
-} from "../../lib/redux/utils/login";
+import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import {
   Card,
@@ -27,31 +25,9 @@ import Header from "../components/Header";
 const Profile = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [isTokenReady, setIsTokenReady] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [loginPassword, setLoginPassword] = useState("bezzthegoat!AA");
   const [profileUpdateMessage, setProfileUpdateMessage] = useState("");
   const [showProfileToast, setShowProfileToast] = useState(false);
-
-  useEffect(() => {
-    const initializeAuth = async () => {
-      // Temp solution until i get authentication from login
-      try {
-        await loginAndStoreToken("abcd@gmail.com", loginPassword);
-        const newToken =
-          typeof window !== "undefined"
-            ? localStorage.getItem("accessToken")
-            : null;
-        setAccessToken(newToken);
-        setIsTokenReady(true);
-      } catch (error) {
-        console.error("Login failed:", error);
-        setIsTokenReady(false);
-      }
-    };
-
-    initializeAuth();
-  }, [loginPassword]);
+  const { data: session, status } = useSession();
 
   const {
     data,
@@ -59,10 +35,13 @@ const Profile = () => {
     isError,
     refetch: refetchProfile,
   } = useGetProfileQuery(undefined, {
-    skip: !isTokenReady,
+    skip: status !== "authenticated",
   });
 
   const profile = data?.data;
+  const userName = (session?.user as any)?.name || profile?.full_name || "User";
+  const userEmail = session?.user?.email || profile?.email || "";
+  const userRole = session?.user?.role || profile?.role || "";
   const passwordRules = {
     required: "New password is required",
     minLength: { value: 8, message: "Password must be at least 8 characters" },
@@ -103,14 +82,13 @@ const Profile = () => {
       });
     }
   }, [profile, resetProfileForm]);
-  const dashlink = profile?.role ? `/${profile.role}` : "/unauthorized";
+  const dashlink = userRole ? `/${userRole}` : "/unauthorized";
 
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
     formState: { errors: passwordErrors },
     watch: watchPassword,
-    reset: resetPasswordForm,
   } = useForm({ mode: "onChange" });
 
   const [updateProfile, { isLoading: isProfileUpdating }] =
@@ -135,7 +113,6 @@ const Profile = () => {
     setProfileUpdateMessage("");
     setShowProfileToast(false);
 
-    // FormData for the request body
     const fd = new FormData();
     fd.append("full_name", formData.fullName);
     fd.append("email", formData.email);
@@ -159,6 +136,8 @@ const Profile = () => {
             email: refreshed.data.data.email || "",
             role: refreshed.data.data.role || "",
           });
+          // Refresh NextAuth session so header and session-based info update
+          await refreshSession();
         }
       } else {
         setProfileUpdateStatus("error");
@@ -224,33 +203,50 @@ const Profile = () => {
     setPasswordChangeStatus("loading");
     setPasswordChangeMessage("");
     setShowPasswordToast(false);
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : accessToken;
-    if (!token) {
+
+    const accessToken = (session as any)?.access;
+    if (!accessToken) {
       setPasswordChangeStatus("error");
       setPasswordChangeMessage("No access token found. Please login again.");
       setShowPasswordToast(true);
       return;
     }
-    const result = await updatePassword({
-      accessToken: token,
-      currentPassword: formData.currentPassword,
-      newPassword: formData.newPassword,
-    });
-    if (result.success) {
-      setPasswordChangeStatus("success");
-      setPasswordChangeMessage(result.message);
-      setShowPasswordToast(true);
-      setLoginPassword(formData.newPassword);
-      resetPasswordForm();
-    } else {
+
+    try {
+      const response = await fetch(
+        "https://a2sv-application-platform-backend-team2.onrender.com/profile/me/change-password",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            old_password: formData.currentPassword,
+            new_password: formData.newPassword,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setPasswordChangeStatus("success");
+        setPasswordChangeMessage(
+          data.message || "Password updated successfully."
+        );
+        setShowPasswordToast(true);
+      } else {
+        setPasswordChangeStatus("error");
+        setPasswordChangeMessage(
+          data.message ||
+            data.detail ||
+            "Failed to update password. Please try again."
+        );
+        setShowPasswordToast(true);
+      }
+    } catch (error: any) {
       setPasswordChangeStatus("error");
       setPasswordChangeMessage(
-        result.details ||
-          result.message ||
-          "Failed to update password. Please check your current password and try again."
+        error?.message || "Failed to update password. Please try again."
       );
       setShowPasswordToast(true);
     }
@@ -259,7 +255,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
       <Header
-        name={isLoading ? "Loading..." : profile?.full_name || "User"}
+        name={isLoading ? "Loading..." : userName}
         dashboardLink={dashlink}
       ></Header>
       <main className="flex-1 mt-10">
@@ -309,7 +305,7 @@ const Profile = () => {
                       Failed to load profile data
                     </span>
                   ) : (
-                    profile?.full_name || ""
+                    userName
                   )}
                 </h1>
                 <p className="text-base text-[#6B7280]">
@@ -322,7 +318,7 @@ const Profile = () => {
                       Failed to load profile data
                     </span>
                   ) : (
-                    profile?.email || ""
+                    userEmail
                   )}
                 </p>
               </div>

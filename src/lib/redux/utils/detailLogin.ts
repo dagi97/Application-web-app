@@ -1,7 +1,10 @@
-export async function submitReview(reviewId: string, payload: any): Promise<{ success: boolean; error?: string }> {
+export async function submitReview(
+  reviewId: string,
+  payload: any,
+  accessToken: string
+): Promise<{ success: boolean; error?: string }> {
   if (typeof window === "undefined") return { success: false, error: "No window object" };
-  let token = localStorage.getItem("reviewer_token") || localStorage.getItem("access_token");
-  if (!token) {
+  if (!accessToken) {
     return { success: false, error: "No auth token" };
   }
   try {
@@ -11,7 +14,7 @@ export async function submitReview(reviewId: string, payload: any): Promise<{ su
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
       }

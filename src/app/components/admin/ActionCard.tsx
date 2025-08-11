@@ -10,7 +10,7 @@ const ActionCard = ({title,description,page}: ActionCardProps) => {
         <p className='text-[#4B5563] mb-2'>{description}</p>
         <Link href={
             page === 'Users' ? '/admin/users' :
-            page === 'Cycles' ? '/admin/cycles' :
+            page === 'Cycles' ? '/admin/cycle':
             page === 'Analytics' ? '/admin/analytics' : '#'
         }>
             <div className=' text-[#4F46E5] flex gap-1'>

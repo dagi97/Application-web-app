@@ -1,9 +1,11 @@
-'use client'
+"use client";
+
 import { useForm } from "react-hook-form";
-import { useAppSelector } from "@/lib/redux/hooks";
 import { useCreateCycleMutation } from "@/lib/redux/api/adminApi";
 import { useState } from "react";
-import AdminNav from '@/app/components/navigation/AdminNav';
+import AdminNav from "@/app/components/navigation/AdminNav";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type FormValue = {
   cycle_name: string;
@@ -13,11 +15,13 @@ type FormValue = {
 };
 
 export default function CreateCycle() {
+  const { data: session } = useSession();
+  const accessToken = session?.access;
   const [createCycle, { isLoading }] = useCreateCycleMutation();
-  const { accessToken } = useAppSelector((state) => state.auth);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -33,43 +37,38 @@ export default function CreateCycle() {
   const onSubmit = async (data: FormValue) => {
     setSubmitSuccess(false);
     setSubmitError(null);
-    
+
     try {
+      if (!accessToken) throw new Error("No access token found. Please login.");
+
       const payload = {
         name: data.cycle_name,
         start_date: data.start_date,
         end_date: data.end_date,
       };
 
-      const response = await createCycle({
-        body: payload,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        }
-      }).unwrap();
+      // Call mutation without manual headers
+      const response = await createCycle(payload).unwrap();
 
-      // Check for success in response if your API returns it
       if (response.success !== false) {
         reset();
         setSubmitSuccess(true);
+        setTimeout(() => {
+          router.push("/admin/cycle");
+        }, 2000);
       } else {
         throw new Error(response.message || "Failed to create cycle");
       }
     } catch (err: any) {
       console.error("API Error:", err);
       let errorMessage = "Failed to create cycle. Please try again.";
-      
+
       if (err.data) {
-        // Handle structured error response
-        errorMessage = err.data.message || 
-                       err.data.error || 
-                       JSON.stringify(err.data);
+        errorMessage =
+          err.data.message || err.data.error || JSON.stringify(err.data);
       } else if (err.message) {
-        // Handle general error
         errorMessage = err.message;
-      } else if (err.status === 'FETCH_ERROR') {
-        // Handle network errors
+      } else if (err.status === "FETCH_ERROR") {
         errorMessage = "Network error. Please check your connection.";
       }
 
@@ -79,7 +78,7 @@ export default function CreateCycle() {
 
   return (
     <div className="w-full max-w-[1920px] p-4 md:p-10">
-      <AdminNav/>
+      <AdminNav />
       <div className="flex flex-col gap-2 mb-6 md:mb-10">
         <h1 className="text-xl md:text-2xl font-bold">Create new cycle</h1>
         <p className="text-sm md:text-base text-gray-600">
@@ -99,7 +98,9 @@ export default function CreateCycle() {
                 className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
                   errors.cycle_name ? "border-red-500" : "border-gray-300"
                 } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("cycle_name", { required: "Cycle name is required" })}
+                {...register("cycle_name", {
+                  required: "Cycle name is required",
+                })}
                 placeholder="Enter cycle name"
               />
               {errors.cycle_name && (
@@ -119,7 +120,9 @@ export default function CreateCycle() {
                 } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
                 {...register("country", { required: "Country is required" })}
               >
-                <option value="" disabled>Select a country</option>
+                <option value="" disabled>
+                  Select a country
+                </option>
                 <option value="ethiopia">Ethiopia</option>
                 <option value="kenya">Kenya</option>
                 <option value="nigeria">Nigeria</option>
@@ -141,7 +144,9 @@ export default function CreateCycle() {
                 className={`w-full h-9 md:h-10 px-3 py-1 md:py-2 border ${
                   errors.start_date ? "border-red-500" : "border-gray-300"
                 } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-                {...register("start_date", { required: "Start date is required" })}
+                {...register("start_date", {
+                  required: "Start date is required",
+                })}
               />
               {errors.start_date && (
                 <p className="text-red-500 text-xs mt-1">
@@ -184,7 +189,7 @@ export default function CreateCycle() {
             </div>
           )}
 
-          {/* Success Message - Only shows after successful submission */}
+          {/* Success Message */}
           {submitSuccess && !isLoading && !submitError && (
             <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
               Cycle created successfully!
