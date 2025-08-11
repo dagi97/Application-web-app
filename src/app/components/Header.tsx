@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 interface HeaderProps {
   name: string;
@@ -12,6 +13,8 @@ interface HeaderProps {
 
 const Header = (prop: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const IsActive = (path: string) => pathname === path;
 
   return (
     <header className="bg-white">
@@ -29,7 +32,11 @@ const Header = (prop: HeaderProps) => {
           </div>
           <Link
             href={prop.dashboardLink}
-            className="py-2 border-b-2 border-blue-500 text-sm hover:text-[#6B7280] hidden md:inline-block"
+            className={
+              IsActive(`${prop.dashboardLink}`)
+                ? "border-b-2 border-[#6366F1] text-[#111827]"
+                : "text-[#6B7280]"
+            }
           >
             Dashboard
           </Link>
@@ -37,7 +44,11 @@ const Header = (prop: HeaderProps) => {
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link
               href="/profile"
-              className="py-2 border-b-2 border-transparent text-[#793bf0] hover:text-[#51158C]"
+              className={
+                IsActive("/profile")
+                  ? "border-b-2 border-[#6366F1] text-[#111827]"
+                  : "text-[#6B7280]"
+              }
             >
               Your Profile
             </Link>
