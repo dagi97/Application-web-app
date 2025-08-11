@@ -18,7 +18,7 @@ type FormData = {
 };
 
 export default function ResetPassword() {
-  const { resetPassword, toastMessage, toastType, clearToast } = useAuth();
+  const { resetPassword, toastMessage, toastType, clearToast,loading } = useAuth();
   const [success, setSuccess] = useState(false);
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
@@ -123,7 +123,8 @@ export default function ResetPassword() {
             </div>
           </div>
           <div className="w-full mt-6">
-            <Button text="Update Password" />
+            <Button text={loading ? "updating password ..." : "update password"}
+                        disabled={loading} type="submit"/>
           </div>
         </form>
       </AuthLayout>

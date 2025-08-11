@@ -22,7 +22,7 @@ const ForgotPassword = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const { forgotPassword, toastMessage, toastType, clearToast } = useAuth();
+  const { forgotPassword, toastMessage, toastType, clearToast, loading } = useAuth();
 
   const [toast, setToast] = useState({
     show: false,
@@ -79,7 +79,8 @@ const ForgotPassword = () => {
           )}
           <div className="w-full flex flex-col justify-between">
             <div className="h-[24px]" />
-            <Button text="Send reset link" />
+            <Button text={loading ? "sending reset link..." : "Send reset link"}
+            disabled={loading} type="submit"/>
             <div className="h-[24px]" />
           </div>
         </form>
