@@ -28,7 +28,7 @@ export default function ReviewerFeedback({
   if (error)
     return <div className="text-base text-red-600">Error fetching review</div>;
 
-  if (!reviewResponse?.data?.review) {
+  if (!reviewResponse?.data?.review_details) {
     return (
       <div className="text-base text-gray-700">
         No reviewer feedback has been submitted for this application yet.
@@ -36,7 +36,7 @@ export default function ReviewerFeedback({
     );
   }
 
-  const review = reviewResponse.data.review;
+  const review = reviewResponse.data.review_details;
 
   return (
     <div className="bg-white p-6 rounded-md shadow-md max-w-lg">

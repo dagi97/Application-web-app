@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import HeaderReviewDetail from "../../components/HeaderReviewDetail";
+import HeaderReviewDetail from "./HeaderReviewDetail";
 import {
   Card,
   CardHeader,
@@ -11,21 +11,33 @@ import {
   Input,
   Textarea,
   Label,
-} from "../../components/Card2";
-import type { ReviewDetail } from "../../../lib/redux/types/detailData";
-import { submitReview } from "../../../lib/redux/utils/detailLogin";
-import Toaster from "../../components/Toaster";
+} from "./Card2";
+import type { ReviewDetail } from "../../lib/redux/types/detailData";
+import { submitReview } from "../../lib/redux/utils/detailLogin";
+import Toaster from "./Toaster";
 
-const ReviewerDetailPage: React.FC = () => {
+interface ReviewerDetailComponentProps {
+  reviewDetail: ReviewDetail | null;
+  reviewerName?: string | null;
+  isLoading?: boolean;
+  isError?: boolean;
+  leftHovered?: boolean;
+  onLeftHoverChange?: (hovered: boolean) => void;
+  readonly?: boolean;
+  reviewStatus?: string | null;
+}
+
+const ReviewerDetailComponent: React.FC<ReviewerDetailComponentProps> = ({
+  reviewDetail,
+  reviewerName,
+  isLoading = false,
+  isError = false,
+  leftHovered = false,
+  onLeftHoverChange,
+  readonly = false,
+  reviewStatus = null,
+}) => {
   const { data: session } = useSession();
-  const [reviewDetail, setReviewDetail] = useState<ReviewDetail | null>(null);
-  const [reviewerName, setReviewerName] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [leftHovered, setLeftHovered] = useState(false);
-  const [readonly, setReadonly] = useState(false);
-  const [reviewStatus, setReviewStatus] = useState<string | null>(null);
-
   const {
     register,
     handleSubmit,
@@ -46,43 +58,6 @@ const ReviewerDetailPage: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState<"success" | "error">("success");
-
-  // Mock data for now - in a real app, this would come from an API
-  useEffect(() => {
-    // Simulate loading data
-    setIsLoading(true);
-    setTimeout(() => {
-      setReviewDetail({
-        id: "1",
-        name: "John Doe",
-        school: "University of Example",
-        degree: "Computer Science",
-        leetcode: "johndoe",
-        codeforces: "johndoe",
-        essays: [
-          {
-            question: "Why A2SV?",
-            answer: "I want to learn and grow with A2SV."
-          },
-          {
-            question: "Tell us about yourself",
-            answer: "I am a passionate developer."
-          }
-        ],
-        resumeURL: "#",
-        reviewDetails: {
-          activityCheckNotes: "",
-          resumeScore: 0,
-          essayWhyA2svScore: 0,
-          essayAboutYouScore: 0,
-          technicalInterviewScore: 0,
-          behavioralInterviewScore: 0,
-        }
-      } as ReviewDetail);
-      setReviewerName("Reviewer Name");
-      setIsLoading(false);
-    }, 1000);
-  }, []);
 
   useEffect(() => {
     const details = reviewDetail?.reviewDetails;
@@ -162,7 +137,9 @@ const ReviewerDetailPage: React.FC = () => {
   }, [showToast]);
 
   const handleLeftHoverChange = (hovered: boolean) => {
-    setLeftHovered(hovered);
+    if (onLeftHoverChange) {
+      onLeftHoverChange(hovered);
+    }
   };
 
   return (
@@ -457,4 +434,4 @@ const ReviewerDetailPage: React.FC = () => {
   );
 };
 
-export default ReviewerDetailPage;
+export default ReviewerDetailComponent;

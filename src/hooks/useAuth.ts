@@ -17,7 +17,7 @@ interface RegisterData {
 export const useAuth = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams?.get("redirect") || "/";
   const { data: session, status } = useSession();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

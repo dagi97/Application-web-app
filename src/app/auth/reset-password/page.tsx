@@ -11,14 +11,15 @@ import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import { useSearchParams } from "next/navigation";
 import Toaster from "@/app/components/Toaster";
+import SuspenseWrapper from "@/app/components/SuspenseWrapper";
 
 type FormData = {
   password: string;
   confirmPassword: string;
 };
 
-export default function ResetPassword() {
-  const { resetPassword, toastMessage, toastType, clearToast,loading } = useAuth();
+function ResetPasswordContent() {
+  const { resetPassword, toastMessage, toastType, clearToast, loading } = useAuth();
   const [success, setSuccess] = useState(false);
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
@@ -98,21 +99,23 @@ export default function ResetPassword() {
                 isLast={false}
                 type="password"
                 placeholder="New Password"
-                {...register("password", { required: "Password is required" })}
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters",
+                  },
+                })}
               />
               {errors.password && (
-                <p className="text-red-500 text-xs">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-xs">{errors.password.message}</p>
               )}
-            </div>
-            <div className="flex flex-col gap-1">
               <InputField
                 isLast={true}
                 type="password"
-                placeholder="Confirm New Password"
+                placeholder="Confirm Password"
                 {...register("confirmPassword", {
-                  required: "Please confirm password",
+                  required: "Please confirm your password",
                 })}
               />
               {errors.confirmPassword && (
@@ -122,20 +125,28 @@ export default function ResetPassword() {
               )}
             </div>
           </div>
-          <div className="w-full mt-6">
-            <Button text={loading ? "updating password ..." : "update password"}
-                        disabled={loading} type="submit"/>
-          </div>
+          <Button
+            text={loading ? "Resetting..." : "Reset Password"}
+            type="submit"
+            disabled={loading}
+          />
         </form>
+        <Toaster
+          message={toast.message}
+          type={toast.type}
+          show={toast.show}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       </AuthLayout>
       <Footer />
-
-      <Toaster
-        message={toast.message}
-        type={toast.type}
-        show={toast.show}
-        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-      />
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <SuspenseWrapper>
+      <ResetPasswordContent />
+    </SuspenseWrapper>
   );
 }

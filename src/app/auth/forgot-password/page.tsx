@@ -10,12 +10,13 @@ import HeaderForIndex from "@/app/components/HeaderForIndex";
 import Footer from "@/app/components/Footer";
 import { useState, useEffect } from "react";
 import Toaster from "@/app/components/Toaster";
+import SuspenseWrapper from "@/app/components/SuspenseWrapper";
 
 type FormData = {
   email: string;
 };
 
-const ForgotPassword = () => {
+function ForgotPasswordContent() {
   const {
     register,
     handleSubmit,
@@ -79,8 +80,11 @@ const ForgotPassword = () => {
           )}
           <div className="w-full flex flex-col justify-between">
             <div className="h-[24px]" />
-            <Button text={loading ? "sending reset link..." : "Send reset link"}
-            disabled={loading} type="submit"/>
+            <Button 
+              text={loading ? "sending reset link..." : "Send reset link"}
+              disabled={loading} 
+              type="submit"
+            />
             <div className="h-[24px]" />
           </div>
         </form>
@@ -92,7 +96,6 @@ const ForgotPassword = () => {
         </Link>
       </AuthLayout>
       <Footer />
- 
 
       <Toaster
         message={toast.message}
@@ -100,8 +103,15 @@ const ForgotPassword = () => {
         show={toast.show}
         onClose={() => setToast((prev) => ({ ...prev, show: false }))}
       />
- 
     </div>
+  );
+}
+
+const ForgotPassword = () => {
+  return (
+    <SuspenseWrapper>
+      <ForgotPasswordContent />
+    </SuspenseWrapper>
   );
 };
 
