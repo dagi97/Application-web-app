@@ -47,9 +47,11 @@ const HeaderForIndex = () => {
             >
               Testimonials
             </a>
-            <button className="text-white bg-[#4338CA] px-4 py-2 rounded-md mt-2 font-medium mb-2">
-              Apply Now
-            </button>
+            <Link href="/auth/signin">
+              <button className="text-white bg-[#4338CA] px-4 py-2 rounded-md mt-2 font-medium mb-2">
+                Apply Now
+              </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -104,12 +106,15 @@ const HeaderForIndex = () => {
             >
               Testimonials
             </a>
-            <button
-              className="w-[150px] text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Apply Now
-            </button>
+            <Link href="/auth/signin">
+
+              <button
+                className="w-[150px] text-white bg-[#4338CA] px-4 py-2 rounded-md font-medium mt-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Apply Now
+              </button>
+            </Link>
           </div>
         </div>
       )}

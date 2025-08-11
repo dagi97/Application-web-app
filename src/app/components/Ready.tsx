@@ -1,5 +1,6 @@
 import React from 'react'
 import Button from './Button'
+import Link from 'next/link'
 const Ready = () => {
     return (
         <div
@@ -16,14 +17,16 @@ const Ready = () => {
             {/* <button className='bg-white text-[#4338CA] px-4 py-2 rounded-md
             mt-2 font-medium
             '>Apply Now</button> */}
-            <Button
-                style={{ color: '#4338CA', font: 'medium' }}
-                className='bg-white px-4 py-2 rounded-md mt-2 font-medium'
-                variant='secondary'
-                size="medium"
-            >
-                Apply Now
-            </Button>
+            <Link href="/auth/signin">
+                <Button
+                    style={{ color: '#4338CA', font: 'medium' }}
+                    className='bg-white px-4 py-2 rounded-md mt-2 font-medium'
+                    variant='secondary'
+                    size="medium"
+                >
+                    Apply Now
+                </Button>
+            </Link>
 
             {/* <Button size="small" variant='secondary'
                 className=' px-4 py-2 rounded-md
