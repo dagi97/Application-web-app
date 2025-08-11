@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import Header from "./ApplicantHeader";
 import TimeLineCard from "./TimeLinecard";
@@ -10,7 +9,7 @@ export default function ApplicationProgressPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <Header name="john" />
+      <Header />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

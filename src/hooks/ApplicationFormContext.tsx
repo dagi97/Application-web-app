@@ -46,7 +46,7 @@ const ApplicationFormContext = createContext<ApplicationFormContextType | null>(
   null
 );
 
-export const ApplicationFormProvider = ({
+export const ApplicationFormProviderEdit = ({
   children,
 }: {
   children: React.ReactNode;

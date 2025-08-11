@@ -2,13 +2,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu } from "lucide-react";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
+import { useGetProfileQuery } from "@/lib/redux/api/ProfileApiSlice";
 
-interface HeaderProps {
-  name: string;
-}
-
-const Header = (prop: HeaderProps) => {
+const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { data: profileData } = useGetProfileQuery();
+  const userName = profileData?.data?.full_name || "User";
 
   return (
     <header className="bg-white">
@@ -21,17 +22,11 @@ const Header = (prop: HeaderProps) => {
               rel="noopener noreferrer"
               className="cursor-pointer"
             >
-              <Image
-                src={"/a2sv_logo.png"}
-                alt="A2SV"
-                width={96}
-                height={96}
-                className="h-6 w-auto ml-16"
-              />
+              <img src={"/a2sv-logo.svg"} alt="A2SV" />
             </a>
           </div>
           <a
-            href="#"
+            href="/applicant"
             className="py-2 border-b-2 border-blue-500 text-sm hover:text-[#6B7280] hidden md:inline-block"
           >
             Dashboard
@@ -39,7 +34,7 @@ const Header = (prop: HeaderProps) => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <a
-              href="#"
+              href="/profile"
               className="py-2 border-b-2 border-transparent text-[#793bf0] hover:text-[#51158C]"
             >
               Your Profile
@@ -48,11 +43,12 @@ const Header = (prop: HeaderProps) => {
               href="#"
               className="py-2 border-b-2 border-transparent hover:text-[#829FAB]"
             >
-              {prop.name || "John Doe"}
+              {userName}
             </a>
             <a
               href="#"
               className="py-2 border-b-2 border-transparent text-[#6B7280] hover:underline hover:text-[#829FAB]"
+              onClick={() => signOut({ callbackUrl: "/" })}
             >
               Logout
             </a>
@@ -75,19 +71,22 @@ const Header = (prop: HeaderProps) => {
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-4 py-2 space-y-2">
             <Link
-              href="/applicant/dashboard"
+              href="/applicant"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Dashboard
             </Link>
             <Link
-              href="/applicant/profile"
+              href="/profile"
               className="block text-gray-600 hover:text-gray-900 py-2"
             >
               Your Profile
             </Link>
-            <span className="block text-gray-600 py-2">John Doe</span>
-            <button className="block text-gray-600 hover:text-gray-900 py-2">
+            <span className="block text-gray-600 py-2"> {userName}</span>
+            <button
+              className="block text-gray-600 hover:text-gray-900 py-2"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
               Logout
             </button>
           </div>

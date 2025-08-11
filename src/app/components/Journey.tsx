@@ -3,7 +3,7 @@ import Phase from './Phase'
 
 const Journey = () => {
     return (
-        <div className='p-20
+        <div id="journey" className='p-20
         px-10 sm:px-30
         '>
             <h3 className='text-4xl font-bold text-center'>Your Journey to Silicon Valley</h3>

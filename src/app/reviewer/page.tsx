@@ -3,12 +3,13 @@
 import Image from "next/image";
 import { useGetAssignedReviewsQuery } from "../../lib/redux/api/reviewsApiSlice";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import ApplicationCard from "../components/ApplicationCard";
+import Header from "../components/Header";
 import {
   fetchReviewerProfile,
-  loginAndStoreToken,
+  fetchReviewDetails,
 } from "../../lib/redux/utils/login";
-import ApplicationCard from "./ApplicationCard";
-import Header from "./Header";
 
 export default function ReviewerDashboard() {
   const [leftHovered, setLeftHovered] = useState(false);
@@ -16,14 +17,21 @@ export default function ReviewerDashboard() {
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "underReview" | "complete"
   >("all");
-  const [sortBy, setSortBy] = useState("date");
-  const [reviewerName, setReviewerName] = useState("Reviewer");
-  const [reviewerProfile, setReviewerProfile] = useState<any>(null);
 
-  // This is a temporary solution for testing purposes (login), change when mixed with others
   useEffect(() => {
-    loginAndStoreToken("abcd@gmail.com", "bezzthegoat!AA").catch(() => { });
-  }, []);
+    setCurrentPage(1);
+    if (data?.data?.reviews) {
+      setApplications(data.data.reviews);
+    }
+  }, [selectedFilter]);
+  const [sortBy, setSortBy] = useState("date");
+  const { data: session } = useSession();
+  const reviewerName =
+    (session?.user && "name" in session.user
+      ? (session.user as { name?: string }).name
+      : undefined) ||
+    session?.user?.email ||
+    "Reviewer";
 
   useEffect(() => {
     const token =
@@ -33,8 +41,6 @@ export default function ReviewerDashboard() {
     if (token) {
       fetchReviewerProfile(token).then((profile) => {
         if (profile) {
-          setReviewerProfile(profile);
-          setReviewerName(profile.full_name || "Reviewer");
         }
       });
     }
@@ -45,6 +51,9 @@ export default function ReviewerDashboard() {
     limit: 10,
   });
   const [applications, setApplications] = useState<any[]>([]);
+  const [reviewDetailsMap, setReviewDetailsMap] = useState<Record<string, any>>(
+    {}
+  );
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -52,6 +61,25 @@ export default function ReviewerDashboard() {
       setApplications(data.data.reviews);
     }
   }, [data]);
+
+  useEffect(() => {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("access_token")
+        : null;
+    async function fetchAllReviewDetails() {
+      if (!token || applications.length === 0) return;
+      const detailsMap: Record<string, any> = {};
+      await Promise.all(
+        applications.map(async (app) => {
+          const detail = await fetchReviewDetails(app.application_id, token);
+          detailsMap[app.application_id] = detail;
+        })
+      );
+      setReviewDetailsMap(detailsMap);
+    }
+    fetchAllReviewDetails();
+  }, [applications]);
 
   // Temp solution until i figure out how to change the status on the backend, this is just for local state management
   const handleStatusChange = (applicationId: string, newStatus: string) => {
@@ -68,10 +96,16 @@ export default function ReviewerDashboard() {
     selectedFilter === "all"
       ? applications
       : applications.filter((app) => {
+        const reviewDetail = reviewDetailsMap[app.application_id];
         if (selectedFilter === "underReview") {
-          return app.status === "under_review";
+          return (
+            reviewDetail &&
+            reviewDetail.review_details != null &&
+            app.status !== "accepted" &&
+            app.status !== "rejected"
+          );
         } else if (selectedFilter === "complete") {
-          return app.status === "accepted";
+          return app.status === "rejected" || app.status === "accepted";
         }
         return true;
       });
@@ -96,21 +130,10 @@ export default function ReviewerDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F3F4F6] font-sans">
-      <Header name={reviewerName} />
+      <Header name={reviewerName} dashboardLink="/reviewer" />
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mt-12 mb-24">
-          {/* Debug section - remove later
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-900">
-            <strong>Debug Info:</strong>
-            <pre style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-              {JSON.stringify(
-                { data, isLoading, isError, reviewerProfile },
-                null,
-                2
-              )}
-            </pre>
-          </div> */}
           <div className="mb-8">
             <h1 className="text-3xl font-extrabold">Assigned Applications</h1>
             {isLoading ? (
@@ -125,8 +148,8 @@ export default function ReviewerDashboard() {
             <div className="flex items-center gap-2">
               <button
                 className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "all"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
                   }`}
                 onClick={() => setSelectedFilter("all")}
                 type="button"
@@ -135,8 +158,8 @@ export default function ReviewerDashboard() {
               </button>
               <button
                 className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "underReview"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
                   }`}
                 onClick={() => setSelectedFilter("underReview")}
                 type="button"
@@ -145,8 +168,8 @@ export default function ReviewerDashboard() {
               </button>
               <button
                 className={`px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors duration-150 ${selectedFilter === "complete"
-                    ? "text-white bg-indigo-600 hover:bg-indigo-800"
-                    : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
+                  ? "text-white bg-indigo-600 hover:bg-indigo-800"
+                  : "bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]"
                   }`}
                 onClick={() => setSelectedFilter("complete")}
                 type="button"
@@ -160,7 +183,7 @@ export default function ReviewerDashboard() {
               </label>
               <select
                 id="sort-by"
-                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2"
+                className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 cursor-pointer"
                 value={sortBy}
                 onChange={(val) =>
                   setSortBy(val.target.value === "name" ? "name" : "date")
@@ -190,6 +213,7 @@ export default function ReviewerDashboard() {
                   key={application.application_id}
                   application={application}
                   onStatusChange={handleStatusChange}
+                  reviewerName={reviewerName}
                 />
               ))
             )}
@@ -211,18 +235,21 @@ export default function ReviewerDashboard() {
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               >
                 <Image
-                  src={leftHovered ? "/left_hover.png" : "/left.png"}
+                  src={
+                    leftHovered ? "/images/left_hover.png" : "/images/left.png"
+                  }
                   onMouseEnter={() => setLeftHovered(true)}
                   onMouseLeave={() => setLeftHovered(false)}
                   alt="left"
                   width={48}
                   height={48}
+                  className="cursor-pointer"
                 />
               </button>
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i + 1}
-                  className={`flex items-center justify-center w-9 h-9 rounded-md border ${currentPage === i + 1
+                  className={`flex items-center justify-center w-9 h-9 rounded-md border cursor-pointer ${currentPage === i + 1
                       ? "border-indigo-600 bg-indigo-600 text-white"
                       : "border-gray-300 bg-white hover:bg-gray-50"
                     }`}
@@ -239,12 +266,17 @@ export default function ReviewerDashboard() {
                 }
               >
                 <Image
-                  src={rightHovered ? "/right_hover.png" : "/right.png"}
+                  src={
+                    rightHovered
+                      ? "/images/right_hover.png"
+                      : "/images/right.png"
+                  }
                   onMouseEnter={() => setRightHovered(true)}
                   onMouseLeave={() => setRightHovered(false)}
                   alt="left"
                   width={48}
                   height={48}
+                  className="cursor-pointer"
                 />
               </button>
             </div>

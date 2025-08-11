@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import HeaderReviewDetail from "../components/HeaderReviewDetail";
+import HeaderReviewDetail from "../../components/HeaderReviewDetail";
 import {
   Card,
   CardHeader,
@@ -10,11 +10,11 @@ import {
   Input,
   Textarea,
   Label,
-} from "../components/Card2";
-import type { ReviewDetail } from "../../lib/redux/types/detailData";
-import { submitReview } from "../../lib/redux/utils/detailLogin";
-import { loginAndStoreToken } from "../../lib/redux/utils/login";
-import Toaster from "../components/Toaster";
+} from "../../components/Card2";
+import type { ReviewDetail } from "../../../lib/redux/types/detailData";
+import { submitReview } from "../../../lib/redux/utils/detailLogin";
+import { loginAndStoreToken } from "../../../lib/redux/utils/login";
+import Toaster from "../../components/Toaster";
 
 interface ReviewerDetailPageProps {
   reviewDetail: ReviewDetail | null;

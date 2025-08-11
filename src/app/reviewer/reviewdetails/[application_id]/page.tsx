@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   mapApiToReviewDetail,
   ReviewDetail,
-} from "../../../lib/redux/types/detailData";
+} from "../../../../lib/redux/types/detailData";
 import ReviewerDetailPage from "../page";
 
 const ReviewDetailsPage = () => {

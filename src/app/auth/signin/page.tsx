@@ -5,11 +5,14 @@ import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import { useAuth } from "@/hooks/useAuth";
-import Providers from "@/app/providers/ReduxProvider";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import HeaderAuth from "@/app/components/HeaderAuth";
 const SignIn = () => {
   type FormData = {
     password: string;
     email: string;
+    role: string;
     rememberMe?: boolean;
   };
   const onSubmit = (data: FormData) => {
@@ -25,6 +28,7 @@ const SignIn = () => {
   const { login, loading } = useAuth();
   return (
     <div className="bg-[#F9FAFB]">
+      <HeaderAuth text="Create Account" />
       <AuthLayout>
         <AuthHeader
           title="Sign in to your account"
@@ -97,10 +101,9 @@ const SignIn = () => {
           <Button text={loading ? "Signing in..." : "Sign In"} disabled={loading} />
         </form>
       </AuthLayout>
+      <Footer />
     </div>
   );
 };
 
-export default () => (
-  <Providers><SignIn /></Providers>
-)
+export default SignIn;

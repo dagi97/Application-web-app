@@ -1,8 +1,5 @@
-"use client"
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
-import { useAssignReviewerMutation } from '../lib/redux/api/applicationApi'
+"use client";
+import { useState } from 'react';
 
 const Actions = () => {
     return (
@@ -15,95 +12,101 @@ const Actions = () => {
     )
 }
 
-const apibase = 'https://a2sv-application-platform-backend-team2.onrender.com'
+export default function DropDown({ reviewers, appId, onAssignReviewer, currentStatus, currentReviewer }: any) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isAssignOpen, setIsAssignOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
-export const DropDown2 = ({ reviewers, appId }: any) => {
+    const handleAssignReviewer = async (reviewerId: string) => {
+        try {
+            await onAssignReviewer(appId, reviewerId);
+            setIsAssignOpen(false);
+            setIsOpen(false);
+        } catch (error) {
+            console.error('Assignment failed:', error);
+        }
+    };
+
     return (
-        <div className="dropdown">
-            <ul tabIndex={0} className="menu bg-base-200 rounded-box dropdown-content z-[1] inline-block ">
-                <details className="[&>summary::-webkit-details-marker]:hidden [&>summary::marker]:hidden">
-                    <summary className="flex items-center gap-2"><Actions /></summary>
-                    <ul className='bg-white py-3 rounded-lg'>
-                        <li>
-                            <a>Review</a>
-                        </li>
-                        <li>
-                            <a>View Details</a>
-                        </li>
-                        <li>
-                            <details className="dropdown dropdown-right flex items-start [&>summary::-webkit-details-marker]:hidden [&>summary::marker]:hidden">
-                                <summary className="btn btn-ghost btn-sm inline-flex items-center gap-4">
-                                    <p className='min-w-[150px]'>Assign to Reviewer</p>
-                                    <img src="/DropDownIcon.svg" alt="Dropdown Icon" className="w-4 h-4 mt-1" />
-                                </summary>
-                                <ul className="menu bg-base-200 w-56 rounded-box dropdown-content z-[1] pl-5">
-                                    <li key={crypto.randomUUID()} className="flex items-center gap-2">
-                                        <span
-                                            className="font-inter font-medium text-[14px] leading-[20px] align-bottom"
-                                            style={{ letterSpacing: '0.01em', color: '#374151' }}
-                                        >
-                                            Search for a reviewer
-                                        </span>
-                                    </li>
-                                    {reviewers.map((reviewer: any) => (
-                                        <li
-                                            key={reviewer.id}
-                                            className="flex items-center gap-2 cursor-pointer"
-                                            onClick={async () => {
-                                                try {
-                                                    const getStoredToken = () => {
-                                                        const access = typeof window !== 'undefined' ? (localStorage.getItem('access_token') || sessionStorage.getItem('access_token')) : null;
-                                                        return access;
-                                                    };
-                                                    const token = getStoredToken();
+        <div className="relative inline-block text-left">
+            <div>
+                <button
+                    type="button"
+                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={() => setIsOpen(!isOpen)}
+                >
+                    <Actions />
+                </button>
+            </div>
 
-                                                    const response = await fetch(
-                                                        `${apibase}/manager/applications/${appId}/assign`,
-                                                        {
-                                                            method: 'PATCH',
-                                                            headers: {
-                                                                'Content-Type': 'application/json',
-                                                                'Authorization': `Bearer ${token}`,
-                                                            },
-                                                            body: JSON.stringify({
-                                                                reviewer_id: reviewer.id,
-                                                            }),
-                                                        }
-                                                    );
-                                                    if (!response.ok) {
-                                                        throw new Error(`HTTP error! status: ${response.status}`);
-                                                    }
-                                                    console.log('Assignment successful');
-                                                    if (typeof window !== 'undefined') {
-                                                        window.location.reload();
-                                                    }
-                                                } catch (error) {
-                                                    console.error('Assignment failed:', error);
-                                                }
-                                            }}
-                                        >
-                                            <img src="/ProfileIcon.svg" alt="Profile Icon" className="w-[16px] h-[16px]" />
-                                            <span
-                                                className="font-inter font-medium text-[14px] leading-[20px] align-bottom"
-                                                style={{ letterSpacing: '0.01em', color: '#374151' }}
-                                            >
-                                                {reviewer.full_name}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </details>
-                        </li>
-                    </ul>
-                </details>
-            </ul>
+            {isOpen && (
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                    <div className="py-1">
+                        <a
+                            href={`/manager/detail/${appId}`}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            View Details
+                        </a>
+
+                        <div className="relative">
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex justify-between items-center"
+                                onClick={() => setIsAssignOpen(!isAssignOpen)}
+                            >
+                                <span>Assign Reviewer</span>
+                                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+
+                            {isAssignOpen && (
+                                <div className="absolute left-full top-0 ml-1 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+                                    <div className="py-1">
+                                        <div className="px-3 py-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Search reviewers..."
+                                                className="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                        <div className="max-h-48 overflow-y-auto border-t border-gray-200">
+                                            {reviewers && reviewers.length > 0 ? (
+                                                reviewers
+                                                    .filter((reviewer: any) =>
+                                                        (reviewer.full_name || reviewer.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                        (reviewer.email || "").toLowerCase().includes(searchTerm.toLowerCase())
+                                                    )
+                                                    .map((reviewer: any) => (
+                                                        <button
+                                                            key={reviewer.id}
+                                                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center gap-2"
+                                                            onClick={() => handleAssignReviewer(reviewer.id)}
+                                                        >
+                                                            <img src="/ProfileIcon.svg" alt="Profile" className="w-4 h-4" />
+                                                            <div className="flex flex-col">
+                                                                <span className="font-medium">{reviewer.full_name || reviewer.name}</span>
+                                                                <span className="text-xs text-gray-500">{reviewer.email}</span>
+                                                            </div>
+                                                        </button>
+                                                    ))
+                                            ) : (
+                                                <div className="px-4 py-2 text-sm text-gray-500">
+                                                    No reviewers available
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
-    );
-}
-
-export default function DropDown({ reviewers, appId }: any) {
-    console.log("REVIEWERS:", reviewers)
-    return (
-        <DropDown2 reviewers={reviewers} appId={appId} />
     );
 }

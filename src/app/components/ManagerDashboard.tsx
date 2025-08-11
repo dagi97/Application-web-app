@@ -1,65 +1,54 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import AllApplications from "@/app/components/AllApplications";
-import Header from "@/components/Header";
+import HeaderManagerDetail from "@/app/components/HeaderManagerDetail";
 import StatCard from "@/app/components/StatCard";
-import TeamPerformance from "@/app/components/TeamPerformance";
-import { useAssignReviewerMutation } from "@/lib/redux/api/applicationApi";
-// import { useAssignReviewerMutation } from "@/app/lib/redux/api/applicationApi";
-
-// API base URL
-const API_BASE = "https://a2sv-application-platform-backend.onrender.com";
+import TeamPerformance from "./TeamPerformance";
+import Footer from "@/app/components/Footer";
+import {
+    useAssignReviewerMutation,
+    useDecideApplicationMutation,
+    useGetAllReviewersQuery
+} from "@/lib/redux/api/managerApi";
 
 export default function DashboardPage() {
     const [applications, setApplications] = useState<any[]>([]);
-    const [reviewers, setReviewers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    // Use existing Redux API for assignReviewer
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    // Use Redux API hooks
     const [assignReviewer] = useAssignReviewerMutation();
+    const [decideApplication] = useDecideApplicationMutation();
+    const { data: reviewersData, isLoading: reviewersLoading } = useGetAllReviewersQuery();
 
-    // GET /manager/applications/ - List Applications (USING MOCK DATA)
+    // Redirect if not authenticated or not a manager
+    useEffect(() => {
+        if (status === "loading") return;
+
+        if (!session) {
+            router.push("/auth/signin");
+            return;
+        }
+
+        if (session.user?.role !== "manager") {
+            router.push("/unauthorized");
+            return;
+        }
+    }, [session, status, router]);
+
+    // GET /manager/applications/ - List Applications with full details
     const fetchApplications = async () => {
         try {
-            // Mock response matching API format
-            const mockResponse = {
-                success: true,
-                data: {
-                    applications: [
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afa1",
-                            applicant_name: "John Doe",
-                            status: "pending_review",
-                            assigned_reviewer_name: null
-                        },
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-                            applicant_name: "Jane Smith",
-                            status: "in_progress",
-                            assigned_reviewer_name: "Alice Reviewer"
-                        },
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afa3",
-                            applicant_name: "Bob Johnson",
-                            status: "accepted",
-                            assigned_reviewer_name: "Bob Reviewer"
-                        }
-                    ],
-                    total_count: 3,
-                    page: 1,
-                    limit: 10
-                },
-                message: "Applications retrieved successfully"
-            };
-
-            setApplications(mockResponse.data.applications);
-
-            // Real API call (commented out since auth isn't working)
-            /*
-            const response = await fetch(`${API_BASE}/manager/applications/`, {
+            const response = await fetch("https://a2sv-application-platform-backend-team2.onrender.com/manager/applications/", {
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${session?.access}`,
                 },
             });
 
@@ -68,86 +57,57 @@ export default function DashboardPage() {
             }
 
             const data = await response.json();
-            setApplications(data.data?.applications || []);
-            */
+            if (data.success && data.data) {
+                const basicApplications = data.data.applications || [];
+
+                // Fetch full details for each application to get submitted_at
+                const applicationsWithDetails = await Promise.all(
+                    basicApplications.map(async (app: any) => {
+                        try {
+                            const detailResponse = await fetch(`https://a2sv-application-platform-backend.onrender.com/applications/${app.id}`, {
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${session?.access}`,
+                                },
+                            });
+
+                            if (detailResponse.ok) {
+                                const detailData = await detailResponse.json();
+                                if (detailData.success && detailData.data) {
+                                    // Merge the basic app data with the detailed data
+                                    return {
+                                        ...app,
+                                        ...detailData.data
+                                    };
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Failed to fetch details for application ${app.id}:`, err);
+                        }
+                        // Return basic app data if detail fetch fails
+                        return app;
+                    })
+                );
+
+                setApplications(applicationsWithDetails);
+            }
         } catch (err) {
             console.error("Failed to fetch applications:", err);
             setError(err instanceof Error ? err.message : "Unknown error");
         }
     };
 
-    // GET /manager/applications/available-reviewers/ - Get Available Reviewers (USING MOCK DATA)
-    const fetchReviewers = async () => {
-        try {
-            // Mock response matching API format with performance metrics
-            const mockResponse = {
-                success: true,
-                data: {
-                    reviewers: [
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afb1",
-                            full_name: "Alice Reviewer",
-                            email: "alice@example.com",
-                            name: "Alice Reviewer", // For TeamPerformance compatibility
-                            assigned: 3,
-                            average: 8,
-                            reviews: 12
-                        },
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afb2",
-                            full_name: "Bob Reviewer",
-                            email: "bob@example.com",
-                            name: "Bob Reviewer", // For TeamPerformance compatibility
-                            assigned: 2,
-                            average: 12,
-                            reviews: 8
-                        },
-                        {
-                            id: "3fa85f64-5717-4562-b3fc-2c963f66afb3",
-                            full_name: "Carol Reviewer",
-                            email: "carol@example.com",
-                            name: "Carol Reviewer", // For TeamPerformance compatibility
-                            assigned: 4,
-                            average: 6,
-                            reviews: 15
-                        }
-                    ],
-                    total_count: 3
-                },
-                message: "Available reviewers retrieved successfully"
-            };
-
-            setReviewers(mockResponse.data.reviewers);
-
-            // Real API call (commented out since auth isn't working)
-            /*
-            const response = await fetch(`${API_BASE}/manager/applications/available-reviewers?page=1&limit=10`, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            setReviewers(data.data?.reviewers || []);
-            */
-        } catch (err) {
-            console.error("Failed to fetch reviewers:", err);
-            setError(err instanceof Error ? err.message : "Unknown error");
-        }
-    };
-
-    // PATCH /manager/applications/{application_id}/assign/ - Assign Reviewer (USING EXISTING REDUX API)
+    // PATCH /manager/applications/{application_id}/assign/ - Assign Reviewer
     const handleAssignReviewer = async (applicationId: string, reviewerId: string) => {
         try {
-            // Use existing Redux API implementation
-            await assignReviewer({ appId: applicationId, reviewer_id: reviewerId });
+            await assignReviewer({ appId: applicationId, reviewer_id: reviewerId }).unwrap();
+            setSuccessMessage("Reviewer assigned successfully!");
 
             // Refresh applications to show updated assignment
             await fetchApplications();
+
+            // Clear success message after 3 seconds
+            setTimeout(() => setSuccessMessage(null), 3000);
 
             return { success: true };
         } catch (err) {
@@ -157,41 +117,22 @@ export default function DashboardPage() {
         }
     };
 
-    // PATCH /manager/applications/{application_id}/decide/ - Decide Application (USING MOCK DATA)
+    // PATCH /manager/applications/{application_id}/decide/ - Decide Application
     const handleDecideApplication = async (applicationId: string, status: string, decisionNotes: string) => {
         try {
-            // Mock response matching API format
-            console.log(`Mock decision ${status} for application ${applicationId}: ${decisionNotes}`);
+            await decideApplication({
+                appId: applicationId,
+                status: status as "accepted" | "rejected",
+                decision_notes: decisionNotes
+            }).unwrap();
 
-            // Update the local applications array to reflect the decision
-            setApplications(prev => prev.map(app =>
-                app.id === applicationId
-                    ? { ...app, status: status }
-                    : app
-            ));
+            setSuccessMessage(`Application ${status} successfully!`);
 
-            // Real API call (commented out since auth isn't working)
-            /*
-            const response = await fetch(`${API_BASE}/manager/applications/${applicationId}/decide`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    status: status,
-                    decision_notes: decisionNotes
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            // Refresh applications after successful decision
+            // Refresh applications to show updated status
             await fetchApplications();
-            return data;
-            */
+
+            // Clear success message after 3 seconds
+            setTimeout(() => setSuccessMessage(null), 3000);
 
             return { success: true };
         } catch (err) {
@@ -201,76 +142,86 @@ export default function DashboardPage() {
         }
     };
 
+
     useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            try {
-                await Promise.all([
-                    fetchApplications(),
-                    fetchReviewers(),
-                ]);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Unknown error");
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (session && session.access) {
+            const loadData = async () => {
+                setLoading(true);
+                try {
+                    await fetchApplications();
+                } catch (err) {
+                    setError(err instanceof Error ? err.message : "Unknown error");
+                } finally {
+                    setLoading(false);
+                }
+            };
 
-        loadData();
-    }, []);
+            loadData();
+        }
+    }, [session]);
 
-    if (loading) {
+    const isLoading = loading || reviewersLoading || status === "loading";
+
+    if (status === "loading" || !session) {
         return (
-            <div className="flex flex-col">
-                <Header />
-                <main className="ml-[159px] mt-[42px] bg-gray-50 min-h-screen w-full overflow-auto pt-10 px-[100px]">
+            <div className="flex flex-col min-h-screen">
+                <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+                <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
                     <div className="flex items-center justify-center h-64">
-                        <div className="text-lg">Loading dashboard...</div>
+                        <div className="text-lg">Loading...</div>
                     </div>
                 </main>
+                <Footer />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex flex-col">
-                <Header />
-                <main className="ml-[159px] mt-[42px] bg-gray-50 min-h-screen w-full overflow-auto pt-10 px-[100px]">
+            <div className="flex flex-col min-h-screen">
+                <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+                <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
                     <div className="flex items-center justify-center h-64">
                         <div className="text-lg text-red-600">Error: {error}</div>
                     </div>
                 </main>
+                <Footer />
             </div>
         );
     }
 
+    const reviewers = reviewersData?.data?.reviewers || [];
+
     return (
-        <div className="flex flex-col">
-            <Header />
-            <main className="
-      ml-[159px] 
-      mt-[42px]  bg-gray-50 
-      min-h-screen  px-[100px]
-      w-full overflow-auto pt-10">
-                <div className="
-        flex flex-col md:flex-row items-center
-        gap-6">
+        <div className="flex flex-col min-h-screen">
+            <HeaderManagerDetail managerName={session?.user?.name || "Manager"} />
+
+            {successMessage && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative ml-[159px] mt-4 mr-4">
+                    <strong className="font-bold">Success!</strong>
+                    <span className="block sm:inline"> {successMessage}</span>
+                </div>
+            )}
+
+            <main className="flex-1 ml-[159px] mt-[42px] bg-gray-50 w-full overflow-auto pt-10 px-[100px]">
+                <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
                     <StatCard title="Total Applications" count={applications.length || 0} />
                     <StatCard title="Under Review" count={applications.filter((app: any) => app.status === "pending_review").length || 0} />
                     <StatCard title="In Progress" count={applications.filter((app: any) => app.status === "in_progress").length || 0} />
                     <StatCard title="Accepted" count={applications.filter((app: any) => app.status === "accepted").length || 0} />
                 </div>
-                <div className=''>
+
+                <div className="space-y-8">
                     <AllApplications
                         applications={applications}
                         reviewers={reviewers}
                         onAssignReviewer={handleAssignReviewer}
-                        onDecideApplication={handleDecideApplication}
                     />
-                    <TeamPerformance teamMembers={reviewers} />
+                    <TeamPerformance teamMembers={reviewers} applications={applications} />
                 </div>
             </main>
+
+            <Footer />
         </div>
     );
 }

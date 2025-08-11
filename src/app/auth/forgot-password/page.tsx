@@ -5,6 +5,9 @@ import AuthLayout from "@/app/components/AuthLayout";
 import Button from "@/app/components/AuthButton";
 import InputField from "@/app/components/AuthInputField";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import HeaderForIndex from "@/app/components/HeaderForIndex";
+import Footer from "@/app/components/Footer";
 type FormData = {
   email: string;
 };
@@ -16,12 +19,14 @@ const ForgotPassword = () => {
     formState: { errors },
   } = useForm<FormData>();
   const hasError = errors.email;
-  const onSubmit = (data: any) => {
-    // TODO: Send reset link
-  };
+  const { forgotPassword } = useAuth();
 
+  const onSubmit = async (data: FormData) => {
+    await forgotPassword(data.email);
+  };
   return (
     <div className="bg-[#F9FAFB]">
+      <HeaderForIndex/>
       <AuthLayout>
         <AuthHeader
           title="Forgot your password?"
@@ -58,6 +63,7 @@ const ForgotPassword = () => {
           Back to login
         </Link>
       </AuthLayout>
+      <Footer/>
     </div>
   );
 };
